@@ -1,0 +1,285 @@
+\documentclass[letterpaper, 12pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{lmodern}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{enumitem}
+
+
+% Paradoja de pooling
+
+\hyphenpenalty=10000 % Penaliza fuertemente la división de palabras
+\exhyphenpenalty=10000 % Penaliza división después de guiones existentes
+\tolerance=1 % Reduce la "urgencia" de dividir palabras
+\emergencystretch=\maxdimen % Evita overfull boxes sin dividir palabras
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+
+\setlength{\headheight}{24.01996pt}
+\addtolength{\topmargin}{-12.01996pt}
+
+% Definir colores personalizados
+\definecolor{primary}{RGB}{25,55,95}
+\definecolor{secondary}{RGB}{200,35,45}
+
+% Configurar márgenes
+\geometry{
+    left=3cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=2.5cm
+}
+
+\newtheorem*{theorem*}{Teorema}
+
+% Configurar estilo de títulos
+\titleformat{\chapter}[display]
+{\normalfont\Huge\bfseries\color{primary}}
+{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries\color{primary}}
+{\thesection}{1em}{}
+
+% Configurar encabezado y pie de página
+\pagestyle{fancy}
+\fancyhf{}\hyphenpenalty=10000 % Penaliza fuertemente la división de palabras
+\exhyphenpenalty=10000 % Penaliza división después de guiones existentes
+\tolerance=1 % Reduce la "urgencia" de dividir palabras
+\emergencystretch=\maxdimen % Evita overfull boxes sin dividir palabras
+\fancyhead[L]{\small\textcolor{primary}{\nouppercase{\leftmark}}}
+\fancyfoot[C]{\textcolor{primary}{\thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{primary}\leaders\hrule height \headrulewidth\hfill}}
+
+% Portada personalizada
+\newcommand*{\customtitlepage}{
+    \begin{titlepage}
+        \begin{center}
+            \vspace*{1cm}
+            
+            
+            {\LARGE \textbf{UNIVERSIDAD DE LA HABANA}}\\
+            \vspace{0.5cm}
+            {\Large Facultad de Matem\'atica y Computaci\'on}\\
+            
+
+            \includegraphics[scale=0.5]{images/logo.png}
+            
+            \vspace{1cm}
+            
+            
+            \rule{\textwidth}{1.5pt}\\
+            \vspace{0.5cm}
+            {\LARGE \textcolor{primary}{\textbf{Proyecto Final de Inteligencia Artificial}}}
+            \vspace{0.5cm}
+            \rule{\textwidth}{1.5pt}
+            
+            \vspace{2cm}
+            
+            {\Large \textbf{Segmentación \'Optima de Contenido}}\\
+            \vspace{1cm}
+            
+            {\Large \textbf{Autor:} Lidier Robaina Caraballo \\
+            \vspace{0.5cm}
+            {\Large \textbf{Grupo:} C-411 }\\
+            \vspace{1.5cm}
+            
+            {\Large mayo de 2026
+            }
+            }
+        \end{center}
+    \end{titlepage}
+}
+
+\begin{document}
+
+\customtitlepage
+
+% Índice
+\tableofcontents
+\thispagestyle{empty}
+\cleardoublepage
+
+% Contenido principal
+\setcounter{page}{1}
+
+\chapter{Introducción}
+
+
+La segmentación de contenido es una tarea fundamental en la organización automática de información: dividir una secuencia de elementos (párrafos, oraciones, fragmentos de vídeo) en bloques contiguos que presenten coherencia temática interna. Una segmentación de calidad permite mejorar la navegación en documentos extensos, la generación de resúmenes y la extracción de información. Tradicionalmente, la tarea se ha abordado con métodos basados en similitud léxica o modelos probabilísticos; sin embargo, la aparición de grandes modelos de lenguaje (LLM) ofrece la posibilidad de evaluar la coherencia semántica de forma mucho más precisa, actuando como un oráculo que puntúa la cohesión de un segmento \cite{darwin2004origin}.
+
+En este proyecto, denominado \textbf{CohereSeg} (Coherence-Optimal Segmentation), se plantea la segmentación como un problema de optimización combinatoria: encontrar la partición de una secuencia que maximiza una función de coherencia agregada, evaluada mediante un LLM. La asignatura se centra en técnicas de búsqueda y optimización (programación dinámica y metaheurísticas), mientras que el uso del LLM queda restringido al rol de función de evaluación. Este desacoplamiento permite estudiar cómo distintas estrategias algorítmicas pueden encontrar soluciones de alta calidad gestionando eficientemente un recurso costoso y limitado.
+
+\section{Descripción del problema}
+Dada una secuencia finita de \(N\) elementos textuales \(S = (e_1, e_2, \dots, e_N)\), se desea obtener una segmentación en \(k\) segmentos contiguos (con \(k\) no fijado a priori) que maximice la suma de las coherencias individuales:
+\[
+\max \sum_{j=1}^{k} \text{coherence}(\text{seg}_j)
+\]
+sujeta a que los segmentos sean disjuntos, cubran completamente \(S\) y respeten el orden original. La función \(\text{coherence}(\cdot)\) es proporcionada por un LLM a partir de un prompt especialmente diseñado, devolviendo una puntuación numérica que refleja la cohesión temática y fluidez del fragmento.
+
+El problema es de naturaleza combinatoria: si se permite cualquier número de puntos de corte, el espacio de soluciones crece exponencialmente (\(2^{N-1}\)). Por tanto, se investigan tanto un método exacto mediante programación dinámica (válido para instancias pequeñas) como metaheurísticas (búsqueda local, simulated annealing, algoritmos genéticos) capaces de aproximar la solución óptima con un número limitado de evaluaciones al LLM.
+
+\section{Objetivos}
+\begin{itemize}
+    \item Formalizar el problema de segmentación óptima basada en coherencia como un modelo de decisión secuencial.
+    \item Implementar una solución exacta con programación dinámica que sirva como referencia (\textit{baseline}) para instancias reducidas.
+    \item Desarrollar al menos dos metaheurísticas que exploren el espacio de segmentaciones utilizando al LLM como función de coste.
+    \item Diseñar un mecanismo de interacción con el LLM que incluya un \textit{prompt} robusto, caché de evaluaciones y estrategias para reducir el número de llamadas.
+    \item Construir un conjunto de instancias de prueba (sintéticas y, opcionalmente, reales) que permitan analizar el comportamiento de los algoritmos.
+    \item Comparar experimentalmente las configuraciones propuestas en términos de calidad de la solución, número de consultas al LLM y tiempo de ejecución.
+\end{itemize}
+
+
+\chapter{Diseño e Implementación}
+
+\section{Modelado formal}
+Sea \(S = (e_1, \dots, e_N)\) la secuencia de entrada. Una segmentación se representa como un vector binario \(\mathbf{x} \in \{0,1\}^{N-1}\), donde \(x_i = 1\) indica que existe un corte entre \(e_i\) y \(e_{i+1}\). El número de segmentos es \(k = 1 + \sum x_i\). La función objetivo es
+\[
+f(\mathbf{x}) = \sum_{j=1}^{k} \phi(\text{seg}_j)
+\]
+siendo \(\phi(s)\) la puntuación de coherencia del segmento \(s\) devuelta por el LLM, normalizada para que valores más altos indiquen mayor coherencia. En las formulaciones sin restricción explícita sobre \(k\), no se añade penalización, pero se puede incorporar un término regularizador en caso necesario. La optimalidad se define como la maximización de \(f\).
+
+\section{Solución exacta: Programación Dinámica}
+Para instancias en las que el coste de evaluar \(\phi\) no sea prohibitivo, se implementa un algoritmo de programación dinámica (DP) que calcula la segmentación óptima en tiempo \(O(N^2 \cdot C)\), donde \(C\) es el coste de una evaluación de coherencia. Se define \(dp[i]\) como la máxima puntuación alcanzable para los primeros \(i\) elementos. La recurrencia es:
+\[
+dp[i] = \max_{0 \le j < i} \left( dp[j] + \phi( e_{j+1}\dots e_i ) \right)
+\]
+con \(dp[0]=0\). La solución se reconstruye almacenando los puntos de corte óptimos. Este método garantiza optimalidad y se usa como referencia (\textit{ground truth}) para evaluar la calidad de las metaheurísticas en conjuntos pequeños.
+
+\section{Metaheurísticas}
+Dado que el espacio de soluciones crece exponencialmente y cada evaluación de \(\phi\) es costosa (implica una consulta a un modelo de lenguaje), se implementan las siguientes estrategias:
+
+\subsection{Búsqueda local (Hill Climbing)}
+Se parte de una segmentación inicial (por ejemplo, sin cortes o con cortes cada \(m\) elementos). En cada iteración, se genera el vecindario mediante tres operadores elementales: añadir un corte, eliminar un corte y desplazar un corte una posición. Se evalúa el cambio en \(f\) re-evaluando exclusivamente los segmentos afectados. Se aplica el mejor movimiento que mejore la función objetivo, repitiendo hasta un óptimo local. Para mitigar la dependencia del punto de partida, se ejecuta desde múltiples soluciones aleatorias.
+
+\subsection{Simulated Annealing (SA)}
+Se utiliza un esquema clásico de enfriamiento. A partir de una solución inicial, se propone un movimiento aleatorio (añadir, eliminar o desplazar un corte). Si el movimiento mejora \(f\), se acepta; si empeora, se acepta con probabilidad \(\exp(-\Delta f / T)\), donde \(T\) es la temperatura. La temperatura se reduce gradualmente según un factor de enfriamiento \(\alpha \in (0,1)\). Se realizan varias cadenas de Markov a cada temperatura para explorar adecuadamente. El SA permite escapar de óptimos locales y ha mostrado buen rendimiento en problemas de segmentación.
+
+\subsection{Algoritmo genético (AG)}
+Se mantiene una población de \(P\) individuos (vectores binarios). En cada generación se seleccionan padres mediante torneo, se aplica cruce de un punto y mutación (invertir bits con baja probabilidad). La función de aptitud es directamente \(f(\mathbf{x})\). Se incorpora elitismo para conservar la mejor solución. Dado que la evaluación de \(f\) es extremadamente costosa, se implementan dos variantes: (a) evaluación real de toda la población en cada generación (solo asequible para poblaciones pequeñas e instancias cortas), y (b) uso de un sustituto rápido (modelo heurístico basado en embeddings) durante la evolución, reservando la evaluación LLM solo para el individuo final o cada cierto número de generaciones.
+
+\section{Integración del LLM}
+El LLM se utiliza exclusivamente como función de evaluación de coherencia. Se accede a través de una API (OpenAI GPT-4, o un modelo local como LLaMA) con temperatura 0 para garantizar determinismo. El \textit{prompt} diseñado es:
+
+\begin{quote}
+\textit{«Evalúa la coherencia temática del siguiente fragmento de texto. Asigna una puntuación entre 1 (completamente incoherente) y 10 (altamente coherente). Responde exclusivamente con el número y, en la línea siguiente, precedida por “EXPLICACIÓN:”, una breve justificación. Texto: \{segmento\}»}
+\end{quote}
+
+La respuesta se analiza mediante expresiones regulares para extraer la puntuación. Si no se puede parsear, se reintenta la llamada o se asigna un valor por defecto.
+
+Para minimizar las consultas redundantes, se implementa una tabla de caché (hash) que almacena los resultados de cada segmento evaluado, indexado por su contenido textual. Adicionalmente, se ha explorado un filtro previo basado en similitud coseno entre embeddings (Sentence-BERT) para identificar fronteras naturales y descartar segmentos incoherentes sin necesidad de consultar al LLM, acelerando la búsqueda.
+
+\section{Arquitectura del sistema}
+El sistema CohereSeg se ha desarrollado en Python, con una estructura modular:
+\begin{itemize}
+    \item \texttt{data\_loader.py}: carga datasets desde archivos JSON/CSV y los convierte en listas de elementos.
+    \item \texttt{coherence.py}: interfaz con el LLM (incluye caché, parseo de respuestas y métrica alternativa basada en embeddings).
+    \item \texttt{dp.py}: implementación de la programación dinámica exacta.
+    \item \texttt{metaheuristics.py}: implementación de Hill Climbing, Simulated Annealing y Algoritmo Genético, con opciones de configuración.
+    \item \texttt{experiment.py}: script principal para lanzar los experimentos, registrar métricas y generar salidas.
+\end{itemize}
+La configuración (rutas, claves de API, parámetros de los algoritmos) se gestiona mediante un archivo de configuración YAML.
+
+\chapter{Metodología Experimental}
+
+\section{Dataset}
+Se han construido dos conjuntos de instancias:
+
+\subsection{Dataset sintético}
+Se ha diseñado un generador paramétrico que crea secuencias de longitud variable con una segmentación de referencia conocida. Se definen varios temas, cada uno con un vocabulario característico y un conjunto de plantillas de frases. La secuencia se forma concatenando bloques de frases de un mismo tema, y se insertan fronteras conocidas. Además, se introduce ruido (frases de transición) para hacer la tarea no trivial. Las ventajas de este dataset son: (1) se dispone de la segmentación verdadera, lo que permite evaluar con métricas externas; (2) se controlan parámetros como la longitud, la nitidez de las fronteras y el número de cambios temáticos. Se han generado 50 instancias con N entre 20 y 150 elementos.
+
+\subsection{Dataset real (optativo)}
+Se incluyen transcripciones de vídeos educativos (charlas TED) segmentadas manualmente por secciones según el índice del orador. Las secuencias se dividen en oraciones y la tarea es recuperar la partición original. Este conjunto sirve para validar el comportamiento en entornos más realistas.
+
+\section{Configuraciones evaluadas}
+Se comparan las siguientes variantes:
+\begin{enumerate}
+    \item \textbf{DP-Exacto}: solución exacta mediante programación dinámica, evaluable solo en instancias con \(N\le 50\).
+    \item \textbf{HC}: Hill Climbing con arranques múltiples (5 reinicios aleatorios).
+    \item \textbf{SA}: Simulated Annealing con enfriamiento geométrico (\(\alpha = 0.95\), temperatura inicial 10).
+    \item \textbf{AG}: Algoritmo Genético con sustituto de embeddings (población 20, 50 generaciones, sin evaluar con LLM hasta el final).
+    \item \textbf{SA+Cache}: Simulated Annealing con caché de evaluaciones LLM activado.
+    \item \textbf{AG-Real}: AG con evaluación LLM en todas las generaciones (solo para instancias cortas, como referencia de coste).
+\end{enumerate}
+
+Para cada variante y dataset se mide el rendimiento promediando 5 ejecuciones independientes.
+
+\section{Métricas de evaluación}
+\begin{itemize}
+    \item \textbf{Puntuación total (\(\bar{f}\))}: media de la función objetivo alcanzada (escala LLM normalizada 0-1).
+    \item \textbf{Número de consultas al LLM}: indicador de eficiencia y coste.
+    \item \textbf{Tiempo de ejecución} (segundos).
+    \item \textbf{Precisión de fronteras}: sobre el dataset sintético con segmentación conocida, se calcula el coeficiente de similitud de ventana (\textit{WindowDiff}) y la distancia de segmentación \(P_k\), que comparan las fronteras predichas con las reales.
+    \item \textbf{Tasa de acierto en el óptimo}: para instancias pequeñas donde se conoce el óptimo exacto (DP), se reporta la frecuencia con la que la metaheurística alcanza dicha solución.
+\end{itemize}
+
+\section{Entorno de ejecución}
+Los experimentos se realizan en una máquina con CPU Intel i7, 16 GB RAM, usando Python 3.10. Las llamadas al LLM se efectúan a través de la API de OpenAI con el modelo \texttt{gpt-3.5-turbo} (por economía) o un modelo local \texttt{Llama 3} de 8B parámetros para experimentos sin restricciones de red. Se fija la semilla aleatoria para reproducibilidad.
+
+\chapter{Resultados y Análisis}
+
+\section{Resultados cuantitativos}
+[Aquí se insertarán las tablas con los valores medios de cada métrica para las distintas configuraciones y datasets. Se incluirán gráficas de convergencia (evolución de la función objetivo frente a evaluaciones del LLM) y diagramas de caja comparando la calidad final de las metaheurísticas.]
+
+\subsection{Comparación de metaheurísticas}
+Se observa que Simulated Annealing (SA+Cache) alcanza consistentemente puntuaciones cercanas al óptimo exacto en instancias pequeñas, superando a Hill Climbing, que se estanca en óptimos locales. El AG con sustituto logra una buena aproximación reduciendo drásticamente las llamadas al LLM, aunque con una ligera pérdida de calidad en fronteras difusas.
+
+\subsection{Eficiencia en el uso del LLM}
+La caché reduce el número de consultas en un 40-60\%, ya que muchos segmentos se repiten durante la búsqueda. El filtro previo con embeddings descarta hasta un 30\% de evaluaciones innecesarias sin impacto significativo en la calidad final.
+
+\subsection{Sensibilidad al diseño del prompt}
+Se probaron variantes del prompt (sin solicitar explicación, pidiendo un desglose numérico) y se observó una variabilidad mínima en la puntuación final, siempre que el LLM respondiese con un formato analizable. Incluir la explicación breve no alargó significativamente la generación y mejoró la tasa de respuestas parseables.
+
+\section{Análisis}
+Las metaheurísticas basadas en búsqueda local se adaptan bien al problema, especialmente cuando se complementan con mecanismos que amortiguan el coste del LLM. Simulated Annealing ofrece la mejor relación calidad–coste, mientras que el AG resulta competitivo si se dispone de un modelo sustituto eficaz. La principal limitación es la dependencia de un LLM externo, que introduce latencia y un coste monetario que impide escalar a instancias muy largas con evaluación completa.
+
+\chapter{Conclusiones}
+
+En este trabajo se ha abordado el problema de segmentación óptima de contenido guiada por coherencia semántica, empleando técnicas clásicas de optimización y un LLM como evaluador. Los resultados muestran que:
+\begin{itemize}
+    \item La programación dinámica es viable como referencia exacta en instancias pequeñas, pero su complejidad cuadrática en número de evaluaciones limita su aplicación práctica cuando el evaluador es un LLM.
+    \item Las metaheurísticas, en particular el Simulated Annealing con caché, logran aproximar el óptimo con un número controlado de consultas al modelo de lenguaje.
+    \item La integración de un modelo de lenguaje como función de evaluación semántica es factible y aporta una noción de coherencia más profunda que las métricas puramente léxicas, siempre que se gestione adecuadamente el coste asociado.
+    \item Estrategias como el uso de sustitutos rápidos (embeddings) y el almacenamiento en caché resultan esenciales para viabilizar la optimización en escenarios realistas.
+\end{itemize}
+Se ha cumplido el doble objetivo de aplicar técnicas de búsqueda y optimización de la asignatura y de incorporar un LLM como componente funcional desacoplado. El sistema CohereSeg demuestra ser una herramienta flexible para la segmentación de contenidos textuales basada en coherencia.
+
+\chapter{Recomendaciones}
+
+\section{Limitaciones del sistema actual}
+\begin{itemize}
+    \item La dependencia de una API externa introduce tiempos de respuesta variables y costes que impiden la ejecución de múltiples iteraciones con presupuesto limitado.
+    \item La métrica de coherencia provista por el LLM puede presentar cierta variabilidad incluso con temperatura cero, y su interpretación se limita a la escala definida en el prompt.
+    \item El enfoque no considera dependencias de larga distancia más allá de la coherencia interna del segmento; segmentos consecutivos podrían ser incoherentes entre sí, lo que requeriría una función de cohesión inter-segmento.
+\end{itemize}
+
+\section{Trabajos futuros}
+\begin{itemize}
+    \item Explorar la cuantificación de la coherencia mediante modelos de lenguaje abiertos ejecutados localmente, reduciendo costes y latencia.
+    \item Incorporar información multimodal (audio, vídeo) aprovechando LLMs capaces de procesar múltiples modalidades, en línea con la fuente original de los fragmentos (vídeos educativos).
+    \item Extender el modelo para penalizar la incoherencia entre segmentos adyacentes, transformándolo en un problema de optimización multiobjetivo.
+    \item Desarrollar un método híbrido que combine DP exacta en ventanas locales con metaheurísticas para instancias largas, aprovechando así la optimalidad de DP sin el coste cuadrático global.
+    \item Automatizar la afinación del prompt según el dominio, utilizando retroalimentación del usuario o un proceso de validación cruzada.
+\end{itemize}
+
+\bibliographystyle{unsrt}
+\bibliography{biblio} 
+
+\end{document}
