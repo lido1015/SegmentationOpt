@@ -1,61 +1,39 @@
-from __future__ import annotations
-
-from typing import Dict, List, Sequence, Tuple
-
-from llm import CoherenceScore, LlmEvaluator
+from typing import List, Tuple
+from llm import get_coherence
 
 
-class OptimalSegmentationDP:
-    """Implementación exacta de programación dinámica para segmentación óptima."""
+def dp_solution(
+    contents: List[str],
+    unit_coherence: float = 1.0,
+    alpha: float = 0.5
+) -> Tuple[List[int], float]:
 
-    def __init__(self, evaluator: LlmEvaluator) -> None:
-        self.evaluator = evaluator
-        self.score_cache: Dict[Tuple[int, int], float] = {}
+    n = len(contents)
+    if n <= 1:
+        return [], -float('inf')  # No hay posibles cortes
 
-    def _segment_score(self, sequence: Sequence[str], start: int, end: int) -> float:
-        key = (start, end)
-        if key in self.score_cache:
-            return self.score_cache[key]
+    # dp[i] = mejor puntuación para los primeros i elementos
+    dp = [-float('inf')] * (n + 1)
+    dp[0] = 0.0
+    # from[i] = inicio del último segmento en la solución óptima para prefijo i
+    from_idx = [0] * (n + 1)
 
-        segment = sequence[start:end]
-        coherence = self.evaluator.score_segment(segment)
-        self.score_cache[key] = coherence.score
-        return coherence.score
+    # Llenado de la tabla DP (O(n^2))
+    for i in range(1, n + 1):
+        for j in range(i):
+            coherence = get_coherence(contents, j, i, unit_coherence)
+            value = dp[j] + (coherence - alpha)
+            if value > dp[i]:
+                dp[i] = value
+                from_idx[i] = j
 
-    def solve(self, sequence: Sequence[str]) -> Tuple[List[int], float]:
-        n = len(sequence)
-        dp: List[float] = [0.0] * (n + 1)
-        backpointer: List[int] = [-1] * (n + 1)
+    # Reconstrucción de los cortes
+    cuts = [0] * (n - 1)
+    i = n
+    while i > 0:
+        j = from_idx[i]          # inicio del último segmento
+        if j > 0:
+            cuts[j - 1] = 1      # corte después del elemento j-1
+        i = j
 
-        for i in range(1, n + 1):
-            best_score = float("-inf")
-            best_cut = 0
-            for j in range(0, i):
-                candidate_score = dp[j] + self._segment_score(sequence, j, i)
-                if candidate_score > best_score:
-                    best_score = candidate_score
-                    best_cut = j
-            dp[i] = best_score
-            backpointer[i] = best_cut
-
-        cuts: List[int] = []
-        position = n
-        while position > 0:
-            previous = backpointer[position]
-            if previous is None:
-                break
-            if previous != 0:
-                cuts.append(previous)
-            position = previous
-
-        return list(reversed(cuts)), dp[n]
-
-    @staticmethod
-    def decode_segments(sequence: Sequence[str], cuts: Sequence[int]) -> List[Sequence[str]]:
-        segments: List[Sequence[str]] = []
-        start = 0
-        for cut in cuts:
-            segments.append(sequence[start:cut])
-            start = cut
-        segments.append(sequence[start:])
-        return segments
+    return cuts, dp[n]

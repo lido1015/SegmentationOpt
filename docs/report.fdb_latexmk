@@ -1,15 +1,7 @@
 # Fdb version 4
-["bibtex report"] 1777397896.41612 "report.aux" "report.bbl" "report" 1777397899.73419 0
-  "./biblio.bib" 1748982813 833 b5c8b6a373a8041e493957e50a80af0c ""
-  "/usr/share/texlive/texmf-dist/bibtex/bst/base/unsrt.bst" 1292289607 18030 1376b4b231b50c66211e47e42eda2875 ""
-  "report.aux" 1777397898.70151 4018 987094b22d383ca29ffde5376b7fcdd2 "pdflatex"
-  (generated)
-  "report.bbl"
-  "report.blg"
-  (rewritten before read)
-["pdflatex"] 1777397896.71634 "/home/lidier/Ciber/IA/cose/docs/report.tex" "report.pdf" "report" 1777397899.73508 0
+["pdflatex"] 1779831520.27289 "/home/lidier/Ciber/IA/SegmentationOpt/docs/report.tex" "report.pdf" "report" 1779831523.72153 0
   "/etc/texmf/web2c/texmf.cnf" 1775379245.48059 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/lidier/Ciber/IA/cose/docs/report.tex" 1777397886.37724 20777 3575b214d34c0c41f6f93f5066e0f341 ""
+  "/home/lidier/Ciber/IA/SegmentationOpt/docs/report.tex" 1779831512.52529 29722 53dff6811549fab910a16b3ab8523c22 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm" 1246382020 916 f87d7c45f9c908e672703b83b72241a3 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam7.tfm" 1246382020 928 2dc8d444221b7a635bb58038579b861a ""
@@ -99,7 +91,6 @@
   "/usr/share/texmf/fonts/type1/public/lm/lmr8.pfb" 1255129361 122174 a7a08406857c9530a0320a2517f60370 ""
   "/usr/share/texmf/fonts/type1/public/lm/lmri12.pfb" 1255129361 109265 32320cb6133d4d76bf83e27b5eb4009b ""
   "/usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb" 1254269338 27863 09ce3735688ffde955e72da27c95b61a ""
-  "/usr/share/texmf/fonts/type1/public/lm/lmsy6.pfb" 1254269338 28109 6d61305ed3d0eb794ebe36f15cf44aa0 ""
   "/usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb" 1254269338 27802 5c876bb2c4040caaf035d60bd74a86bd ""
   "/usr/share/texmf/fonts/type1/public/lm/lmtt12.pfb" 1255129361 110323 92daea7ca7b4120bd2b54b047c93be27 ""
   "/usr/share/texmf/tex/latex/lm/lmodern.sty" 1616454256 1608 b00724785a9e9c599e5181bb8729160b ""
@@ -112,11 +103,18 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1775379293.69524 5472669 54eaf61a88b6b7896ebd0dac973cb29c ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1775379500 8212516 ea70a536640642e02466738f94c92dd2 ""
-  "images/logo.png" 1748982813 2964 024cc02681c976b6ec533056a2d65670 ""
-  "report.aux" 1777397898.70151 4018 987094b22d383ca29ffde5376b7fcdd2 "pdflatex"
-  "report.bbl" 1777397896.7046 191 d7f02cd9b8843f34c4afd5bedb9b617e "bibtex report"
-  "report.tex" 1777397886.37724 20777 3575b214d34c0c41f6f93f5066e0f341 ""
-  "report.toc" 1777397898.71752 2116 b323d3434027192c9098a1dee69ddb79 "pdflatex"
+  "figures/exp1_case1.png" 1779432049.24999 64215 0b8f3e98f125c4e6d78649406326986a ""
+  "figures/exp1_case2.png" 1779432090.06354 70595 57d68c8533030cbcd6580bee9d9f9bc2 ""
+  "figures/exp1_case3.png" 1779432135.27913 74505 fc145886ec504a0194faa6c47fefc288 ""
+  "figures/final_convergence.png" 1779831441.43587 62888 620164406afce4204bc8877d60533042 ""
+  "figures/ga_convergence.png" 1779828748.91465 21299 173bf44357988aaec75e20187f923cd1 ""
+  "figures/hc_convergence.png" 1779828674.71381 23941 c983a22038f4627a64ca7b1aa5ea5b58 ""
+  "figures/logo.png" 1748982813 2964 024cc02681c976b6ec533056a2d65670 ""
+  "figures/pso_convergence.png" 1779831503.93079 21851 438b53e1750639f8ab1522b788c17932 ""
+  "figures/sa_convergence.png" 1779828713.22224 20380 0e040efbe7b85d9b2999fc8bfd309231 ""
+  "report.aux" 1779831523.37724 8295 c27b1ff8808f0570777ddcf57613a783 "pdflatex"
+  "report.tex" 1779831512.52529 29722 53dff6811549fab910a16b3ab8523c22 ""
+  "report.toc" 1779831523.38525 2690 e85eceb3d18a86fbbdcd6cede6588ae4 "pdflatex"
   (generated)
   "report.aux"
   "report.log"

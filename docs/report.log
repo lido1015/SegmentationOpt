@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.4.5)  28 APR 2026 13:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.4.5)  26 MAY 2026 17:38
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/home/lidier/Ciber/IA/cose/docs/report.tex
-(/home/lidier/Ciber/IA/cose/docs/report.tex
+**/home/lidier/Ciber/IA/SegmentationOpt/docs/report.tex
+(/home/lidier/Ciber/IA/SegmentationOpt/docs/report.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
 (/usr/share/texlive/texmf-dist/tex/latex/base/report.cls
@@ -438,48 +438,48 @@ Package caption Info: End \AtBeginDocument code.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \c@lstlisting=\count315
-<images/logo.png, id=1, 225.84375pt x 225.84375pt>
-File: images/logo.png Graphic file (type png)
-<use images/logo.png>
-Package pdftex.def Info: images/logo.png  used on input line 113.
+<figures/logo.png, id=1, 225.84375pt x 225.84375pt>
+File: figures/logo.png Graphic file (type png)
+<use figures/logo.png>
+Package pdftex.def Info: figures/logo.png  used on input line 113.
 (pdftex.def)             Requested size: 112.92159pt x 112.92159pt.
 [1
 
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc} <./images/logo.png>] (./report.toc
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc} <./figures/logo.png>] (./report.toc
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 4.
  (/usr/share/texmf/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 3.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 4.
  (/usr/share/texmf/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 3.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 4.
  (/usr/share/texmf/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 3.
+(Font)              <12> on input line 4.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 3.
+(Font)              <8> on input line 4.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 3.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
+(Font)              <6> on input line 4.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 4.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 4.
  (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-))
+) [1
+
+])
 \tf@toc=\write3
 \openout3 = `report.toc'.
 
- [1
-
-]
+ [2]
 Cap\'{\i }tulo 1.
 
 Underfull \hbox (badness 2181) in paragraph at lines 126--127
@@ -492,8 +492,8 @@ Underfull \hbox (badness 1242) in paragraph at lines 126--127
  []
 
 
-Underfull \hbox (badness 1264) in paragraph at lines 128--129
-\OT1/lmr/m/n/12 (pro-gra-ma-ci^^Son din^^Sami-ca y me-ta-heur^^S^^Psti-cas), mien-tras que el uso del LLM que-da
+Underfull \hbox (badness 10000) in paragraph at lines 126--127
+
  []
 
 
@@ -502,107 +502,211 @@ Underfull \hbox (badness 6316) in paragraph at lines 128--129
  []
 
 
-Underfull \hbox (badness 1127) in paragraph at lines 137--138
-\OT1/lmr/m/n/12 tan-to un m^^Seto-do exac-to me-dian-te pro-gra-ma-ci^^Son din^^Sami-ca (v^^Sali-do pa-ra ins-tan-cias
- []
+Underfull \hbox (badness 10000) in paragraph at lines 128--129
 
-
-Underfull \hbox (badness 2012) in paragraph at lines 137--138
-\OT1/lmr/m/n/12 pe-que~nas) co-mo me-ta-heur^^S^^Psti-cas (b^^Susque-da lo-cal, si-mu-la-ted an-nea-ling, al-go-rit-mos
- []
-
-
-Underfull \hbox (badness 1371) in paragraph at lines 137--138
-\OT1/lmr/m/n/12 gen^^Seti-cos) ca-pa-ces de apro-xi-mar la so-lu-ci^^Son ^^Sopti-ma con un n^^Sume-ro li-mi-ta-do de
  []
 
 [1
 
 
-{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}]
-LaTeX Info: Redefining \. on input line 150.
-LaTeX Info: Redefining \% on input line 150.
- [2]
+]
 Cap\'{\i }tulo 2.
 
-Underfull \hbox (badness 1642) in paragraph at lines 156--158
-\OT1/lmr/m/n/12 siendo $\OML/lmm/m/it/12 ^^^\OT1/lmr/m/n/12 (\OML/lmm/m/it/12 s\OT1/lmr/m/n/12 )$ la pun-tua-ci^^Son de co-he-ren-cia del seg-men-to $\OML/lmm/m/it/12 s$ \OT1/lmr/m/n/12 de-vuel-ta por el LLM,
- []
+Underfull \hbox (badness 10000) in paragraph at lines 146--150
 
-[3
-
-]
-Underfull \hbox (badness 1694) in paragraph at lines 170--171
-\OT1/lmr/m/n/12 ele-men-tos). En ca-da ite-ra-ci^^Son, se ge-ne-ra el ve-cin-da-rio me-dian-te tres ope-ra-do-res
  []
 
 
-Underfull \hbox (badness 1715) in paragraph at lines 173--174
-\OT1/lmr/m/n/12 pro-po-ne un mo-vi-mien-to alea-to-rio (a~nadir, eli-mi-nar o des-pla-zar un cor-te). Si el
+Underfull \hbox (badness 10000) in paragraph at lines 154--156
+
  []
 
 
-Underfull \hbox (badness 4108) in paragraph at lines 176--177
-\OT1/lmr/m/n/12 eli-tis-mo pa-ra con-ser-var la me-jor so-lu-ci^^Son. Da-do que la eva-lua-ci^^Son de $\OML/lmm/m/it/12 f$ \OT1/lmr/m/n/12 es
+Underfull \hbox (badness 10000) in paragraph at lines 168--173
+
  []
 
-LaTeX Font Info:    Trying to load font information for OMS+lmr on input line 182.
-(/usr/share/texmf/tex/latex/lm/omslmr.fd
-File: omslmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-)
-LaTeX Font Info:    Font shape `OMS/lmr/m/it' in size <12> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 182.
-LaTeX Info: Redefining \. on input line 183.
-LaTeX Info: Redefining \% on input line 183.
- [4]
-LaTeX Font Info:    Trying to load font information for OT1+lmtt on input line 192.
+[2
+
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}]
+LaTeX Font Info:    Trying to load font information for OT1+lmtt on input line 181.
  (/usr/share/texmf/tex/latex/lm/ot1lmtt.fd
 File: ot1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Info: Redefining \. on input line 200.
-LaTeX Info: Redefining \% on input line 200.
- [5{/usr/share/texmf/fonts/enc/dvips/lm/lm-rmtt.enc}]
+Underfull \hbox (badness 10000) in paragraph at lines 184--186
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 206--208
+[]\OT1/lmr/m/n/12 Las im-ple-men-ta-cio-nes con-cre-tas de b^^Susque-da lo-cal he-re-dan de
+ []
+
+
+Underfull \hbox (badness 5316) in paragraph at lines 208--209
+[]\OT1/lmtt/m/n/12 HillClimbing\OT1/lmr/m/n/12 : ge-ne-ra un ve-cino me-dian-te \OT1/lmtt/m/n/12 problem.get[]neighbor\OT1/lmr/m/n/12 , acep-ta
+ []
+
+LaTeX Info: Redefining \. on input line 213.
+LaTeX Info: Redefining \% on input line 213.
+[3{/usr/share/texmf/fonts/enc/dvips/lm/lm-rmtt.enc}]
+Underfull \hbox (badness 6775) in paragraph at lines 233--234
+[]\OT1/lmr/m/n/12 la res-pues-ta se par-sea a n^^Sume-ro de-ci-mal y se guar-da en cach^^Se en
+ []
+
+LaTeX Info: Redefining \. on input line 241.
+LaTeX Info: Redefining \% on input line 241.
+[4]
 Cap\'{\i }tulo 3.
-
-Underfull \hbox (badness 2547) in paragraph at lines 209--210
-[]\OT1/lmr/m/n/12 Se in-clu-yen trans-crip-cio-nes de v^^S^^Pdeos edu-ca-ti-vos (char-las TED) seg-men-ta-das
- []
-
-[6
+[5
 
 ]
-Underfull \hbox (badness 3407) in paragraph at lines 217--218
-[]\OT1/lmr/bx/n/12 AG\OT1/lmr/m/n/12 : Al-go-rit-mo Gen^^Seti-co con sus-ti-tu-to de em-bed-dings (po-bla-ci^^Son 20, 50
+<figures/exp1_case1.png, id=42, 586.8324pt x 513.117pt>
+File: figures/exp1_case1.png Graphic file (type png)
+<use figures/exp1_case1.png>
+Package pdftex.def Info: figures/exp1_case1.png  used on input line 275.
+(pdftex.def)             Requested size: 274.6857pt x 240.18633pt.
+LaTeX Info: Redefining \. on input line 279.
+LaTeX Info: Redefining \% on input line 279.
+ [6]
+<figures/exp1_case2.png, id=47, 586.8324pt x 513.117pt>
+File: figures/exp1_case2.png Graphic file (type png)
+<use figures/exp1_case2.png>
+Package pdftex.def Info: figures/exp1_case2.png  used on input line 285.
+(pdftex.def)             Requested size: 274.6857pt x 240.18633pt.
+LaTeX Info: Redefining \. on input line 292.
+LaTeX Info: Redefining \% on input line 292.
+ [7 <./figures/exp1_case1.png> <./figures/exp1_case2.png>]
+<figures/exp1_case3.png, id=53, 586.8324pt x 513.117pt>
+File: figures/exp1_case3.png Graphic file (type png)
+<use figures/exp1_case3.png>
+Package pdftex.def Info: figures/exp1_case3.png  used on input line 295.
+(pdftex.def)             Requested size: 274.6857pt x 240.18633pt.
+LaTeX Info: Redefining \. on input line 322.
+LaTeX Info: Redefining \% on input line 322.
+ [8 <./figures/exp1_case3.png>]
+Underfull \hbox (badness 7832) in paragraph at lines 324--325
+[]\OT1/lmr/m/n/12 Para ca-da al-go-rit-mo se mues-trea-ron alea-to-ria-men-te 10 com-bi-na-cio-nes de
  []
 
-LaTeX Info: Redefining \. on input line 236.
-LaTeX Info: Redefining \% on input line 236.
-[7]
+LaTeX Font Info:    Trying to load font information for OMS+lmr on input line 331.
+(/usr/share/texmf/tex/latex/lm/omslmr.fd
+File: omslmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+)
+LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <12> not available
+(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 331.
+
+Underfull \hbox (badness 10000) in paragraph at lines 331--332
+[]\OT1/lmr/bx/n/12 Mejor con-fi-gu-ra-ci^^Son: \OMS/lmsy/m/n/12 f\OT1/lmtt/m/n/12 stagnation[]limit\OT1/lmr/m/n/12 =150, \OT1/lmtt/m/n/12 max[]evaluations\OT1/lmr/m/n/12 =1000,
+ []
+
+<figures/hc_convergence.png, id=58, 424.9476pt x 328.8285pt>
+File: figures/hc_convergence.png Graphic file (type png)
+<use figures/hc_convergence.png>
+Package pdftex.def Info: figures/hc_convergence.png  used on input line 359.
+(pdftex.def)             Requested size: 320.46199pt x 247.98051pt.
+LaTeX Info: Redefining \. on input line 363.
+LaTeX Info: Redefining \% on input line 363.
+[9]
+Underfull \hbox (badness 10000) in paragraph at lines 367--368
+[]\OT1/lmr/bx/n/12 Rango ex-plo-ra-do: \OT1/lmtt/m/n/12 T0 $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 10\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 50\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 100\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 , \OT1/lmtt/m/n/12 alpha $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 0[]8\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0[]9\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0[]95\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0[]99\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 ,
+ []
+
+
+Underfull \hbox (badness 6978) in paragraph at lines 367--368
+\OT1/lmtt/m/n/12 iters[]per[]temp $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 5\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 10\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 20\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 50\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 , \OT1/lmtt/m/n/12 max[]evaluations $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 1000\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 2000\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 5000\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 369--370
+[]\OT1/lmr/bx/n/12 Mejor con-fi-gu-ra-ci^^Son: \OMS/lmsy/m/n/12 f\OT1/lmtt/m/n/12 T0\OT1/lmr/m/n/12 =50.0, \OT1/lmtt/m/n/12 alpha\OT1/lmr/m/n/12 =0.9, \OT1/lmtt/m/n/12 iters[]per[]temp\OT1/lmr/m/n/12 =5,
+ []
+
+LaTeX Info: Redefining \. on input line 394.
+LaTeX Info: Redefining \% on input line 394.
+[10 <./figures/hc_convergence.png>]
+<figures/sa_convergence.png, id=67, 408.3255pt x 328.8285pt>
+File: figures/sa_convergence.png Graphic file (type png)
+<use figures/sa_convergence.png>
+Package pdftex.def Info: figures/sa_convergence.png  used on input line 397.
+(pdftex.def)             Requested size: 320.46199pt x 258.07574pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 405--406
+[]\OT1/lmr/bx/n/12 Rango ex-plo-ra-do: \OT1/lmtt/m/n/12 population[]size $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 10\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 20\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 50\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 , \OT1/lmtt/m/n/12 mutation[]rate
+ []
+
+
+Underfull \hbox (badness 2435) in paragraph at lines 405--406
+\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 0[]01\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0[]05\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0[]1\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 , \OT1/lmtt/m/n/12 elitism $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 1\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 3\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 5\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 , \OT1/lmtt/m/n/12 max[]generations $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 20\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 50\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 100\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 ,
+ []
+
+LaTeX Info: Redefining \. on input line 408.
+LaTeX Info: Redefining \% on input line 408.
+[11 <./figures/sa_convergence.png>]
+<figures/ga_convergence.png, id=72, 417.7206pt x 328.8285pt>
+File: figures/ga_convergence.png Graphic file (type png)
+<use figures/ga_convergence.png>
+Package pdftex.def Info: figures/ga_convergence.png  used on input line 435.
+(pdftex.def)             Requested size: 320.46199pt x 252.26547pt.
+
+Underfull \hbox (badness 1077) in paragraph at lines 443--444
+[]\OT1/lmr/bx/n/12 Rango ex-plo-ra-do: \OT1/lmtt/m/n/12 population[]size $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 10\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 20\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 50\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 , \OT1/lmtt/m/n/12 w $\OMS/lmsy/m/n/12 2 f\OT1/lmr/m/n/12 0[]5\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0[]7\OML/lmm/m/it/12 ; \OT1/lmr/m/n/12 0[]9\OMS/lmsy/m/n/12 g$\OT1/lmr/m/n/12 , \OT1/lmtt/m/n/12 c1
+ []
+
+LaTeX Info: Redefining \. on input line 444.
+LaTeX Info: Redefining \% on input line 444.
+[12 <./figures/ga_convergence.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 445--446
+[]\OT1/lmr/bx/n/12 Mejor con-fi-gu-ra-ci^^Son: \OMS/lmsy/m/n/12 f\OT1/lmtt/m/n/12 population[]size\OT1/lmr/m/n/12 =50, \OT1/lmtt/m/n/12 w\OT1/lmr/m/n/12 =0.7, \OT1/lmtt/m/n/12 c1\OT1/lmr/m/n/12 =2.0, \OT1/lmtt/m/n/12 c2\OT1/lmr/m/n/12 =2.0,
+ []
+
+
+Underfull \hbox (badness 1365) in paragraph at lines 445--446
+\OT1/lmtt/m/n/12 max[]generations\OT1/lmr/m/n/12 =100, \OT1/lmtt/m/n/12 max[]evaluations\OT1/lmr/m/n/12 =5000, \OT1/lmtt/m/n/12 v[]max\OT1/lmr/m/n/12 =5.0\OMS/lmsy/m/n/12 g \OT1/lmr/m/n/12 con $\OML/lmm/m/it/12 F[]$ \OT1/lmr/m/n/12 me-dio =
+ []
+
+
+Overfull \hbox (37.29723pt too wide) in paragraph at lines 453--469
+ [][] 
+ []
+
+<figures/pso_convergence.png, id=77, 417.7206pt x 328.8285pt>
+File: figures/pso_convergence.png Graphic file (type png)
+<use figures/pso_convergence.png>
+Package pdftex.def Info: figures/pso_convergence.png  used on input line 473.
+(pdftex.def)             Requested size: 320.46199pt x 252.26547pt.
+LaTeX Info: Redefining \. on input line 477.
+LaTeX Info: Redefining \% on input line 477.
+[13]
+LaTeX Info: Redefining \. on input line 491.
+LaTeX Info: Redefining \% on input line 491.
+ [14 <./figures/pso_convergence.png>]
+Overfull \hbox (19.61163pt too wide) in paragraph at lines 500--510
+ [][] 
+ []
+
+
+Underfull \hbox (badness 1137) in paragraph at lines 512--513
+[]\OT1/lmr/m/n/12 La Fi-gu-ra 3.8[] mues-tra las cur-vas de con-ver-gen-cia pro-me-dia-das de las cua-tro
+ []
+
+<figures/final_convergence.png, id=85, 859.2903pt x 426.393pt>
+File: figures/final_convergence.png Graphic file (type png)
+<use figures/final_convergence.png>
+Package pdftex.def Info: figures/final_convergence.png  used on input line 516.
+(pdftex.def)             Requested size: 366.24527pt x 181.73187pt.
+LaTeX Info: Redefining \. on input line 523.
+LaTeX Info: Redefining \% on input line 523.
+[15 <./figures/final_convergence.png>]
+LaTeX Info: Redefining \. on input line 526.
+LaTeX Info: Redefining \% on input line 526.
+ [16]
 Cap\'{\i }tulo 4.
-
-Underfull \hbox (badness 5519) in paragraph at lines 242--243
-[]\OT1/lmr/m/n/12 Se ob-ser-va que Si-mu-la-ted An-nea-ling (SA+Cache) al-can-za con-sis-ten-te-men-te
- []
-
-
-Underfull \hbox (badness 1342) in paragraph at lines 251--252
-[]\OT1/lmr/m/n/12 Las me-ta-heur^^S^^Psti-cas ba-sa-das en b^^Susque-da lo-cal se adap-tan bien al pro-ble-ma,
- []
-
-[8
+[17
 
 ]
-LaTeX Info: Redefining \. on input line 253.
-LaTeX Info: Redefining \% on input line 253.
- [9]
 Cap\'{\i }tulo 5.
-[10
-
-]
-Cap\'{\i }tulo 6.
-(./report.bbl [11
-
-]) [12
+[18
 
 ] (./report.aux
 LaTeX Info: Redefining \. on input line 8.
@@ -614,18 +718,18 @@ L3 programming layer <2024-01-22>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 9752 strings out of 474222
- 154091 string characters out of 5748734
- 1934975 words of memory out of 5000000
- 31872 multiletter control sequences out of 15000+600000
+ 9823 strings out of 474222
+ 156161 string characters out of 5748734
+ 1935975 words of memory out of 5000000
+ 31946 multiletter control sequences out of 15000+600000
  610547 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,12n,65p,813b,538s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi8.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmri12.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy6.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt12.pfb>
-Output written on report.pdf (14 pages, 244552 bytes).
+ 57i,12n,65p,973b,611s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/share/texmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi8.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr17.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmri12.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt12.pfb>
+Output written on report.pdf (21 pages, 527400 bytes).
 PDF statistics:
- 122 PDF objects out of 1000 (max. 8388607)
- 77 compressed objects within 1 object stream
+ 156 PDF objects out of 1000 (max. 8388607)
+ 90 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 46 words of extra memory for PDF output out of 10000 (max. 10000000)
 

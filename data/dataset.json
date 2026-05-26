@@ -1,0 +1,418 @@
+[
+  {
+    "contents": [
+      "La cocina molecular emplea nitrógeno líquido para crear texturas imposibles.",
+      "Ferran Adrià popularizó las espumas y las esferificaciones en la alta gastronomía.",
+
+      "El telescopio James Webb observa las primeras galaxias del universo.",
+      "Los exoplanetas en la zona habitable podrían tener agua líquida en superficie.",
+      "La sonda Voyager 1 es el objeto humano más distante de la Tierra.",
+      "La misión Artemis planea enviar astronautas al polo sur lunar antes de 2030.",
+
+      "Julio César fue asesinado en los idus de marzo del 44 a. C.",
+      "El Senado romano acumuló gran poder durante la República tardía.",
+      "Los acueductos romanos abastecían a más de un millón de ciudadanos.",
+      "Augusto instauró la Pax Romana, un largo periodo de estabilidad.",
+      "El Imperio Romano de Occidente cayó en el año 476 d. C.",
+
+      "El FC Barcelona ganó la Liga de Campeones en 2015 con un fútbol de posesión.",
+      "Lionel Messi ha recibido el Balón de Oro en siete ocasiones.",
+      "La Copa del Mundo de fútbol es el evento deportivo más visto del planeta.",
+
+      "El deshielo del permafrost libera metano, acelerando el cambio climático.",
+      "Los fenómenos meteorológicos extremos se han triplicado desde los años ochenta.",
+      "El Acuerdo de París busca limitar el calentamiento global a menos de 2 °C.",
+      "La reforestación masiva podría capturar parte del CO₂ atmosférico sobrante.",
+
+      "Los grandes modelos de lenguaje necesitan cantidades ingentes de datos.",
+      "La inteligencia artificial generativa ya transforma sectores creativos y técnicos."
+    ],
+    "cuts": [1, 5, 10, 13, 17]
+  },
+
+  {
+    "contents": [
+      "La trilogía de Fundación de Isaac Asimov explora el declive galáctico.",
+
+      "Cleopatra fue la última faraona del Antiguo Egipto.",
+
+      "El algoritmo de búsqueda de Google utiliza PageRank.",
+
+      "Usain Bolt ostenta el récord mundial de 100 metros lisos.",
+
+      "El reciclaje de plástico reduce la contaminación oceánica.",
+
+      "Beethoven compuso la Novena Sinfonía estando sordo.",
+
+      "La Mona Lisa de Leonardo da Vinci se exhibe en el Louvre.",
+      "Van Gogh vendió solo una pintura en vida, 'La viña roja'.",
+
+      "La penicilina fue descubierta por Alexander Fleming en 1928.",
+
+      "El Monte Everest es la montaña más alta del mundo.",
+
+      "La ley de oferta y demanda determina los precios en el mercado.",
+      "Adam Smith escribió 'La riqueza de las naciones'.",
+      "El producto interior bruto mide la actividad económica de un país.",
+
+      "El ajedrez tiene más configuraciones posibles que átomos en el universo.",
+
+      "La fotosíntesis convierte la luz solar en energía química."
+    ],
+    "cuts": [0, 1, 2, 3, 4, 5, 7, 8, 9, 12, 13]
+  },
+
+  {
+    "contents": [
+      "Júpiter es el planeta más grande del sistema solar.",
+      "La Gran Mancha Roja es una tormenta anticiclónica gigante en Júpiter.",
+      "Saturno es conocido por sus impresionantes anillos de hielo y roca.",
+      "Marte tiene el volcán más alto del sistema solar, el Monte Olimpo.",
+      "Venus posee una atmósfera densa de dióxido de carbono con efecto invernadero descontrolado.",
+      "Mercurio es el planeta más cercano al Sol y tiene extremas temperaturas.",
+      "Neptuno presenta los vientos más veloces del sistema solar.",
+      "Urano gira acostado sobre su órbita, con una inclinación axial de 98 grados.",
+      "La Tierra es el único planeta conocido que alberga vida.",
+      "El cinturón de asteroides se encuentra entre Marte y Júpiter.",
+
+      "Julio Verne escribió 'Veinte mil leguas de viaje submarino' con el Nautilus.",
+      "El capitán Nemo es uno de los personajes más icónicos de la ciencia ficción.",
+      "'La vuelta al mundo en ochenta días' narra la apuesta de Phileas Fogg.",
+      "Verne anticipó el uso de la electricidad y los submarinos en sus novelas.",
+      "'De la Tierra a la Luna' describe un viaje espacial con un cañón gigante.",
+      "La isla misteriosa es una secuela de 'Veinte mil leguas'.",
+      "Miguel Strogoff es una novela de aventuras ambientada en la Rusia zarista.",
+      "'Los hijos del capitán Grant' recorre coordenadas geográficas reales.",
+      "Verne es considerado uno de los padres de la ciencia ficción moderna.",
+      "Sus libros han sido traducidos a más de 150 idiomas."
+    ],
+    "cuts": [9]
+    },
+
+    {
+    "contents": [
+      "El Renacimiento italiano dio lugar a obras maestras de Leonardo y Miguel Ángel.",
+      "La perspectiva lineal revolucionó la pintura del Quattrocento.",
+      "El mecenazgo de los Médici impulsó a numerosos artistas en Florencia.",
+
+      "El principio de superposición permite que una partícula esté en varios estados a la vez.",
+      "El entrelazamiento cuántico desafía la noción clásica de localidad.",
+      "El experimento de la doble rendija demuestra la dualidad onda-partícula.",
+      "La interpretación de Copenhague postula el colapso de la función de onda al medir.",
+      "Los ordenadores cuánticos aprovechan qubits para resolver ciertos problemas más rápido.",
+
+      "El café arábica representa cerca del 60% de la producción mundial.",
+      "Las cerezas de café se cosechan manualmente en terrenos de altura.",
+      "El tueste influye decisivamente en el perfil aromático del grano.",
+      "Colombia y Brasil lideran las exportaciones internacionales de café.",
+
+      "El lanzamiento de Pong en 1972 marcó el inicio de la industria comercial del videojuego.",
+      "Nintendo rescató el mercado tras la crisis de 1983 con la NES.",
+
+      "El sueño REM es esencial para la consolidación de la memoria.",
+      "La melatonina regula el ciclo circadiano en los mamíferos.",
+      "La privación crónica de sueño eleva el riesgo cardiovascular.",
+      "Los sueños lúcidos permiten al durmiente tomar conciencia del estado onírico.",
+      "La apnea obstructiva afecta a una proporción significativa de la población adulta.",
+      "Dormir entre siete y ocho horas diarias se asocia con una mejor salud cognitiva."
+    ],
+    "cuts": [2, 7, 11, 13]
+  },
+
+  {
+    "contents": [
+      "El impresionismo surgió en Francia a mediados del siglo XIX.",
+      "Claude Monet pintó la serie de los nenúfares durante décadas.",
+      "Las pinceladas sueltas captaban la luz momentánea del paisaje.",
+      "La primera exposición impresionista de 1874 generó rechazo en la crítica.",
+
+      "La corriente del Golfo transporta aguas cálidas hacia el Atlántico Norte.",
+      "El fenómeno de El Niño altera las corrientes del Pacífico ecuatorial.",
+      "La circulación termohalina mueve masas de agua a escala planetaria.",
+      "Los giros oceánicos acumulan residuos plásticos en zonas de convergencia.",
+
+      "Bitcoin utiliza una cadena de bloques descentralizada y un mecanismo de prueba de trabajo.",
+      "Ethereum introdujo los contratos inteligentes y posteriormente migró a prueba de participación.",
+      "La capitalización total del mercado de criptomonedas superó los dos billones de dólares en 2021.",
+
+      "La toma de la Bastilla en 1789 simboliza el inicio de la Revolución.",
+      "La Declaración de los Derechos del Hombre y del Ciudadano proclamó la igualdad jurídica.",
+      "El Reinado del Terror impuso ejecuciones masivas bajo Robespierre.",
+      "Napoleón Bonaparte dio un golpe de Estado en 1799 y puso fin a la fase revolucionaria.",
+      "La Revolución Francesa abolió los privilegios feudales y reconfiguró el mapa político europeo.",
+
+      "El refuerzo positivo mejora la conducta sin generar miedo en los perros.",
+      "La socialización temprana previene problemas de agresividad en la edad adulta.",
+      "Los clickers son herramientas eficaces para marcar comportamientos deseados.",
+      "Cada raza canina responde de forma distinta según su origen funcional."
+    ],
+    "cuts": [3, 7, 10, 15]
+  },
+
+  {
+    "contents": [
+      "Las pirámides de Giza se construyeron durante la dinastía IV.",
+      "Los bloques de caliza se transportaban desde canteras situadas a kilómetros de distancia.",
+
+      "Los paneles fotovoltaicos convierten la luz solar directamente en electricidad.",
+      "La energía eólica representó más del 10% de la generación mundial en 2023.",
+      "Las centrales hidroeléctricas aprovechan la fuerza del agua embalsada.",
+      "La biomasa transforma residuos orgánicos en combustibles y calor.",
+      "Las baterías de litio son fundamentales para almacenar energía intermitente.",
+      "La Agencia Internacional de la Energía prevé que las renovables superen al carbón antes de 2030.",
+
+      "El jazz nació en Nueva Orleans a principios del siglo XX.",
+      "Louis Armstrong popularizó la improvisación como elemento central del género.",
+
+      "Los castillos feudales cumplían funciones defensivas y residenciales.",
+      "Las murallas almenadas permitían a los arqueros disparar protegidos.",
+      "El foso con agua rodeaba la fortaleza para impedir ataques directos.",
+      "El castillo de Carcasona es uno de los conjuntos fortificados mejor conservados de Europa.",
+
+      "Los volcanes en escudo tienen pendientes suaves y erupciones efusivas.",
+      "Los estratovolcanes alternan capas de lava y piroclastos, como el Monte Fuji.",
+      "Las erupciones plinianas expulsan columnas de ceniza que alcanzan la estratosfera.",
+
+      "El soneto consta de catorce versos endecasílabos con rima consonante.",
+      "Garcilaso de la Vega introdujo las formas italianas en la poesía española.",
+      "La generación del 27 fusionó tradición y vanguardia en la lírica hispánica."
+    ],
+    "cuts": [1, 7, 9, 13, 16]
+  },
+
+  {
+    "contents": [
+      "La fotografía analógica utiliza película sensible a la luz para capturar imágenes.",
+      "El diafragma regula la cantidad de luz que entra en el objetivo.",
+      "Ansel Adams perfeccionó el sistema de zonas para controlar la exposición.",
+      "La llegada de las cámaras digitales democratizó el acceso a la imagen.",
+      "Los sensores CMOS superaron en popularidad a los CCD a partir de los años 2010.",
+
+      "La leche cruda conserva los microorganismos que dan carácter al queso artesanal.",
+      "El parmesano se madura durante al menos doce meses antes de su venta.",
+      "La cuajada se corta y se calienta para separar el suero.",
+      "Francia cuenta con más de mil variedades de queso reconocidas.",
+      "Las denominaciones de origen protegidas garantizan la calidad del queso manchego.",
+
+      "Zeus gobernaba el Olimpo y blandía el rayo como arma suprema.",
+      "Los doce trabajos de Heracles fueron impuestos como penitencia.",
+      "Afrodita surgió de la espuma del mar según la Teogonía de Hesíodo.",
+      "El viaje de Odiseo de regreso a Ítaca duró diez años.",
+      "El mito de Prometeo simboliza la entrega del fuego a la humanidad.",
+
+      "El rover Curiosity aterrizó en el cráter Gale en 2012.",
+      "El helicóptero Ingenuity realizó el primer vuelo controlado en otro planeta.",
+      "Los científicos buscan rastros de metano que pudieran indicar actividad biológica.",
+      "Marte posee el volcán más alto del sistema solar, el monte Olimpo.",
+      "La NASA planea enviar una misión tripulada al planeta rojo en la década de 2030."
+    ],
+    "cuts": [4, 9, 14]
+  },
+
+  {
+    "contents": [
+      "El primer iPhone se presentó en 2007 y redefinió el concepto de teléfono móvil.",
+      "Las pantallas táctiles capacitivas sustituyeron a los teclados físicos.",
+      "La red 5G multiplica la velocidad de descarga frente al estándar 4G.",
+
+      "El pez abisal tiene adaptaciones extremas a la falta de luz solar.",
+      "Los organismos bioluminiscentes generan su propia luz mediante reacciones químicas.",
+      "Las fuentes hidrotermales albergan ecosistemas basados en quimiosíntesis.",
+      "El calamar gigante habita en profundidades superiores a mil metros.",
+      "La presión en la fosa de las Marianas supera las mil atmósferas.",
+      "Muchos peces abisales poseen mandíbulas extensibles para atrapar presas escasas.",
+      "Los vehículos operados a distancia permiten explorar regiones antes inaccesibles.",
+
+      "El periodo barroco abarca desde 1600 hasta la muerte de Bach en 1750.",
+      "El bajo continuo era la base armónica sobre la que improvisaban los músicos.",
+      "Vivaldi compuso más de quinientos conciertos, entre ellos Las cuatro estaciones.",
+      "La ópera nació como género a comienzos del Barroco con Monteverdi.",
+
+      "La inflación se define como el aumento generalizado de los precios.",
+      "Los bancos centrales utilizan la tasa de interés para controlar la demanda agregada.",
+      "La hiperinflación alemana de 1923 destruyó el valor del marco en semanas.",
+      "La deflación prolongada puede ser más perjudicial que una inflación moderada.",
+      "El índice de precios al consumo mide la cesta de bienes representativa.",
+      "Las expectativas de inflación influyen en las negociaciones salariales."
+    ],
+    "cuts": [2, 9, 13]
+  },
+
+  {
+    "contents": [
+      "Gutenberg desarrolló la imprenta de tipos móviles hacia 1440 en Maguncia.",
+      "La Biblia de Gutenberg fue el primer libro impreso en serie en Europa.",
+      "La imprenta redujo drásticamente el coste de los manuscritos.",
+      "La Reforma protestante se expandió gracias a la difusión de panfletos impresos.",
+      "Los incunables son los libros impresos antes de 1501.",
+      "La imprenta facilitó el acceso al conocimiento y el nacimiento de la opinión pública.",
+
+      "El ADN contiene la información hereditaria en forma de secuencia de nucleótidos.",
+      "La técnica CRISPR-Cas9 permite editar genes con gran precisión.",
+      "Los genes BRCA1 y BRCA2 están asociados al riesgo de cáncer de mama.",
+      "La epigenética estudia cambios hereditarios no debidos a la secuencia de ADN.",
+      "El proyecto Genoma Humano completó la secuenciación en 2003.",
+      "Las mutaciones puntuales pueden alterar la función de una proteína.",
+      "La terapia génica busca corregir defectos genéticos en células somáticas.",
+      "Los telómeros protegen los extremos de los cromosomas y se acortan con la edad.",
+
+      "El deshielo del océano Ártico abre nuevas rutas comerciales marítimas.",
+      "Rusia ha ampliado su infraestructura militar en la región polar.",
+      "La explotación de hidrocarburos en el Ártico genera disputas territoriales.",
+      "El Consejo Ártico reúne a los ocho estados ribereños.",
+
+      "Los carbohidratos complejos aportan energía sostenida para el ejercicio prolongado.",
+      "La ingesta de proteínas tras el entrenamiento favorece la reparación muscular.",
+      "La creatina monohidratada es uno de los suplementos con mayor respaldo científico.",
+      "La hidratación adecuada previene la disminución del rendimiento.",
+      "Los ácidos grasos omega-3 reducen la inflamación en deportistas de resistencia.",
+      "El índice glucémico influye en la liberación de insulina durante la actividad.",
+      "Los batidos de recuperación combinan proteína y carbohidrato en proporción 1:3.",
+      "La cafeína puede mejorar la concentración y retrasar la fatiga.",
+      "Las dietas vegetarianas bien planificadas cubren las necesidades de atletas.",
+      "Los electrolitos perdidos en el sudor deben reponerse durante ejercicios largos.",
+
+      "Walt Disney estrenó Blancanieves, el primer largometraje animado, en 1937.",
+      "El Studio Ghibli japonés alcanzó reconocimiento mundial con El viaje de Chihiro.",
+      "La técnica de stop motion fotografía maquetas cuadro a cuadro.",
+      "La animación por ordenador se popularizó con Toy Story en 1995.",
+      "Pixar desarrolló el motor RenderMan para simular iluminación realista.",
+
+      "El estoicismo enseña a distinguir lo que depende de uno mismo de lo que no.",
+      "Séneca abogó por la moderación de las pasiones en sus Epístolas a Lucilio.",
+      "Marco Aurelio escribió las Meditaciones como ejercicio de reflexión personal.",
+      "Epicteto fue un esclavo que fundó una escuela estoica en Nicópolis.",
+      "La dicotomía del control reduce la ansiedad ante eventos externos.",
+      "La práctica del premeditatio malorum prepara para afrontar adversidades.",
+      "El estoicismo moderno ha influido en terapias cognitivo-conductuales.",
+
+      "Los arrecifes de coral albergan una cuarta parte de las especies marinas.",
+      "El blanqueamiento ocurre cuando los corales expulsan las algas simbióticas.",
+      "La acidificación oceánica debilita los esqueletos de carbonato cálcico.",
+      "La Gran Barrera de Coral se extiende por más de 2300 kilómetros.",
+
+      "La fibra óptica transmite datos mediante pulsos de luz con mínima atenuación.",
+      "El estándar Wi-Fi 7 duplica el ancho de banda respecto a su predecesor.",
+      "Las constelaciones de satélites Starlink proporcionan internet en zonas rurales.",
+      "La conmutación de paquetes divide la información en bloques independientes.",
+      "El protocolo TCP/IP garantiza la entrega ordenada de datos en la red.",
+      "La latencia es crítica en aplicaciones de videoconferencia y juegos en línea."
+    ],
+    "cuts": [5, 13, 17, 27, 32, 39, 43]
+  },
+  
+  {
+    "contents": [
+      "La cultura olmeca sentó las bases de la civilización mesoamericana.",
+      "Teotihuacán fue una de las ciudades más pobladas del mundo clásico.",
+      "El juego de pelota mesoamericano tenía profundos significados rituales.",
+      "Los mayas desarrollaron un sistema de escritura jeroglífica avanzado.",
+      "El calendario maya combinaba ciclos de 260 y 365 días.",
+      "La agricultura de roza y quema sustentó a grandes poblaciones mayas.",
+      "Chichén Itzá floreció como centro político y religioso en el período posclásico.",
+      "Los mexicas fundaron Tenochtitlán en 1325 sobre un islote del lago Texcoco.",
+      "La Triple Alianza dominó el valle de México antes de la llegada de los españoles.",
+      "El Templo Mayor era el eje ceremonial de la capital mexica.",
+
+      "La programación funcional evita los estados mutables y los efectos secundarios.",
+      "Haskell es un lenguaje puramente funcional con tipado estático fuerte.",
+      "Las funciones de orden superior aceptan otras funciones como argumentos.",
+      "El cálculo lambda constituye la base teórica de la computación funcional.",
+      "La evaluación perezosa difiere el cómputo hasta que el resultado es necesario.",
+      "Los funtores y las mónadas estructuran el manejo de efectos en Haskell.",
+      "La transparencia referencial permite razonar ecuacionalmente sobre los programas.",
+      "Scala combina orientación a objetos con programación funcional en la JVM.",
+      "Clojure apuesta por la inmutabilidad y la concurrencia mediante STM.",
+      "El pattern matching simplifica el manejo de estructuras algebraicas.",
+      "La recursión de cola optimizada evita desbordamientos de pila.",
+      "Los tipos dependientes permiten expresar invariantes complejos en tiempo de compilación.",
+
+      "La viticultura de precisión utiliza sensores para monitorizar el viñedo.",
+      "La variedad de uva tempranillo es la base de los tintos de Rioja.",
+      "El terroir integra suelo, clima y tradición en el carácter del vino.",
+      "La poda en verde limita el vigor y concentra los aromas en la baya.",
+      "La fermentación maloláctica suaviza la acidez en los tintos.",
+      "Las barricas de roble francés aportan notas de vainilla y especias.",
+      "Los vinos de Jerez se crían bajo velo de flor en solera.",
+      "La cata a ciegas entrena el paladar para identificar variedades y añadas.",
+
+      "El ragtime fue la primera expresión popular del jazz a finales del siglo XIX.",
+      "Nueva Orleans amalgamó marchas, blues y ritmos africanos en las brass bands.",
+      "Louis Armstrong revolucionó la improvisación solista en los años veinte.",
+      "La era del swing llevó a las big bands al estrellato mundial.",
+      "El bebop rompió con las convenciones armónicas y aumentó el virtuosismo.",
+      "Charlie Parker y Dizzy Gillespie lideraron la revolución del bebop.",
+      "El cool jazz suavizó el sonido con arreglos más pausados.",
+      "Miles Davis grabó Kind of Blue en 1959, piedra angular del jazz modal.",
+      "El free jazz abolió las estructuras fijas de acordes y melodía.",
+      "John Coltrane exploró la espiritualidad a través de la improvisación extendida.",
+      "El jazz fusión incorporó instrumentos eléctricos y ritmos del rock.",
+      "Wynton Marsalis defendió la tradición acústica en los años ochenta.",
+      "Hoy el jazz dialoga con músicas electrónicas y tradiciones del mundo.",
+      "Los festivales de Montreux y Newport mantienen vivo el circuito internacional.",
+      "La educación jazzística se ha institucionalizado en conservatorios de todo el planeta.",
+
+      "La neuroplasticidad es la capacidad del cerebro para reorganizarse a partir de la experiencia.",
+      "Las sinapsis se fortalecen o debilitan en función del uso repetido.",
+      "La neurogénesis adulta ocurre principalmente en el hipocampo.",
+      "El aprendizaje de un segundo idioma aumenta la densidad de la materia gris.",
+      "La rehabilitación tras un ictus se apoya en circuitos alternativos.",
+      "La meditación prolongada modifica la conectividad de la red neuronal por defecto.",
+      "El estrés crónico reduce la plasticidad sináptica en la corteza prefrontal.",
+
+      "El reloj mecánico portátil surgió en Europa en el siglo XV.",
+      "El escape de áncora mejoró drásticamente la precisión de los relojes.",
+      "Abraham-Louis Breguet inventó el tourbillon para compensar la gravedad.",
+      "Los relojes de pulsera se popularizaron durante la Primera Guerra Mundial.",
+      "El calibre automático utiliza un rotor que aprovecha el movimiento de la muñeca.",
+      "Rolex presentó el primer reloj sumergible con el modelo Oyster en 1926.",
+      "La certificación COSC garantiza una desviación máxima de -4 a +6 segundos diarios.",
+      "Las complicaciones como el calendario perpetuo ajustan meses y años bisiestos.",
+      "El cronógrafo mide intervalos de tiempo mediante ruedas de levas.",
+      "La caja de zafiro transparente permite admirar el movimiento decorado.",
+      "La relojería independiente actual combina técnicas ancestrales con diseño contemporáneo.",
+
+      "La sabana es un bioma tropical dominado por gramíneas y árboles dispersos.",
+      "La temporada seca condiciona las migraciones de grandes herbívoros.",
+      "Los incendios naturales renuevan el paisaje y controlan la expansión arbustiva.",
+      "El baobab almacena agua en su tronco para sobrevivir al estiaje.",
+      "Los elefantes actúan como ingenieros del ecosistema al derribar árboles.",
+      "El guepardo es el depredador más veloz de la sabana africana.",
+      "Las acacias producen taninos para disuadir a los ramoneadores.",
+      "El Serengueti alberga la mayor concentración de ungulados del planeta.",
+      "La coexistencia de carnívoros se basa en la partición de nichos temporales.",
+
+      "La épica homérica narra las hazañas de héroes en hexámetros dactílicos.",
+      "La Ilíada se centra en la cólera de Aquiles durante la guerra de Troya.",
+      "La Odisea relata el azaroso regreso de Odiseo a Ítaca.",
+      "Virgilio compuso la Eneida para glorificar el origen troyano de Roma.",
+      "El Cantar de Mio Cid celebra las gestas del noble castellano desterrado.",
+      "La Chanson de Roland idealiza la caballería y la lucha contra el infiel.",
+      "La poesía épica germánica legó el cantar de los Nibelungos.",
+      "El Mahabharata indio es el poema épico más extenso de la literatura universal.",
+      "El Kalevala finlandés recoge mitos y leyendas de la tradición oral.",
+      "Las epopeyas africanas de Sunyata se transmiten mediante la palabra de los griots.",
+      "El Paraíso Perdido de Milton recupera el aliento épico en el barroco inglés.",
+      "La poesía épica moderna reformula el heroísmo en contextos antiheroicos.",
+      "Los cantares de gesta medievales se difundían oralmente por juglares.",
+
+      "El cacao se cultiva en una franja estrecha a ambos lados del ecuador.",
+      "Las mazorcas albergan granos envueltos en una pulpa dulce.",
+      "La fermentación desarrolla los precursores del aroma y reduce el amargor.",
+      "El conchado refina la textura y volatiliza ácidos indeseables.",
+      "El chocolate negro con alto porcentaje de cacao aporta polifenoles beneficiosos.",
+
+      "La teledetección capta radiación electromagnética reflejada o emitida por la superficie terrestre.",
+      "Los satélites Landsat proporcionan imágenes multiespectrales desde los años setenta.",
+      "El índice NDVI cuantifica el vigor de la vegetación mediante bandas del infrarrojo.",
+      "Los sensores SAR penetran las nubes y obtienen datos independientemente de la iluminación.",
+      "El programa Copernicus de la UE ofrece datos abiertos de observación terrestre.",
+      "La resolución espacial de los sensores comerciales ha alcanzado el orden submétrico.",
+      "La clasificación supervisada asigna píxeles a categorías usando muestras de entrenamiento.",
+      "El análisis de series temporales revela cambios en la cobertura del suelo.",
+      "La constelación PlanetScope revisita diariamente cada punto del planeta.",
+      "La teledetección apoya la respuesta a desastres naturales monitorizando inundaciones e incendios."
+    ],
+    "cuts": [9, 21, 29, 44, 51, 62, 71, 84, 89]
+  }
+]

@@ -80,7 +80,7 @@
             {\Large Facultad de Matem\'atica y Computaci\'on}\\
             
 
-            \includegraphics[scale=0.5]{images/logo.png}
+            \includegraphics[scale=0.5]{figures/logo.png}
             
             \vspace{1cm}
             
@@ -98,7 +98,7 @@
             
             {\Large \textbf{Autor:} Lidier Robaina Caraballo \\
             \vspace{0.5cm}
-            {\Large \textbf{Grupo:} C-411 }\\
+            {\Large \textbf{Grupo:} C-412 }\\
             \vspace{1.5cm}
             
             {\Large mayo de 2026
@@ -123,26 +123,17 @@
 \chapter{Introducción}
 
 
-La segmentación de contenido es una tarea fundamental en la organización automática de información: dividir una secuencia de elementos (párrafos, oraciones, fragmentos de vídeo) en bloques contiguos que presenten coherencia temática interna. Una segmentación de calidad permite mejorar la navegación en documentos extensos, la generación de resúmenes y la extracción de información. Tradicionalmente, la tarea se ha abordado con métodos basados en similitud léxica o modelos probabilísticos; sin embargo, la aparición de grandes modelos de lenguaje (LLM) ofrece la posibilidad de evaluar la coherencia semántica de forma mucho más precisa, actuando como un oráculo que puntúa la cohesión de un segmento \cite{darwin2004origin}.
+La segmentación de contenido es una tarea fundamental en la organización automática de información: dividir una secuencia de elementos (párrafos, oraciones, fragmentos de vídeo) en bloques contiguos que presenten coherencia temática interna. Una segmentación de calidad permite mejorar la navegación en documentos extensos, la generación de resúmenes y la extracción de información. Tradicionalmente, la tarea se ha abordado con métodos basados en similitud léxica o modelos probabilísticos; sin embargo, la aparición de grandes modelos de lenguaje (LLM) ofrece la posibilidad de evaluar la coherencia semántica de forma mucho más precisa, actuando como un oráculo que puntúa la cohesión de un segmento. \\
 
-En este proyecto, denominado \textbf{CohereSeg} (Coherence-Optimal Segmentation), se plantea la segmentación como un problema de optimización combinatoria: encontrar la partición de una secuencia que maximiza una función de coherencia agregada, evaluada mediante un LLM. La asignatura se centra en técnicas de búsqueda y optimización (programación dinámica y metaheurísticas), mientras que el uso del LLM queda restringido al rol de función de evaluación. Este desacoplamiento permite estudiar cómo distintas estrategias algorítmicas pueden encontrar soluciones de alta calidad gestionando eficientemente un recurso costoso y limitado.
+En este proyecto se trata la segmentación como un problema de optimización combinatoria: encontrar la partición de una secuencia que maximiza una función de coherencia agregada, evaluada mediante un LLM. Este enfoque permite estudiar cómo distintas estrategias algorítmicas pueden encontrar soluciones de alta calidad gestionando eficientemente un recurso costoso y limitado. \\
 
-\section{Descripción del problema}
-Dada una secuencia finita de \(N\) elementos textuales \(S = (e_1, e_2, \dots, e_N)\), se desea obtener una segmentación en \(k\) segmentos contiguos (con \(k\) no fijado a priori) que maximice la suma de las coherencias individuales:
-\[
-\max \sum_{j=1}^{k} \text{coherence}(\text{seg}_j)
-\]
-sujeta a que los segmentos sean disjuntos, cubran completamente \(S\) y respeten el orden original. La función \(\text{coherence}(\cdot)\) es proporcionada por un LLM a partir de un prompt especialmente diseñado, devolviendo una puntuación numérica que refleja la cohesión temática y fluidez del fragmento.
-
-El problema es de naturaleza combinatoria: si se permite cualquier número de puntos de corte, el espacio de soluciones crece exponencialmente (\(2^{N-1}\)). Por tanto, se investigan tanto un método exacto mediante programación dinámica (válido para instancias pequeñas) como metaheurísticas (búsqueda local, simulated annealing, algoritmos genéticos) capaces de aproximar la solución óptima con un número limitado de evaluaciones al LLM.
-
-\section{Objetivos}
+Se plantean los siguientes objetivos:
 \begin{itemize}
-    \item Formalizar el problema de segmentación óptima basada en coherencia como un modelo de decisión secuencial.
+    \item Formalizar el problema de segmentación óptima basada en coherencia.
     \item Implementar una solución exacta con programación dinámica que sirva como referencia (\textit{baseline}) para instancias reducidas.
-    \item Desarrollar al menos dos metaheurísticas que exploren el espacio de segmentaciones utilizando al LLM como función de coste.
+    \item Desarrollar metaheurísticas que exploren el espacio de segmentaciones utilizando al LLM como función de coste.
     \item Diseñar un mecanismo de interacción con el LLM que incluya un \textit{prompt} robusto, caché de evaluaciones y estrategias para reducir el número de llamadas.
-    \item Construir un conjunto de instancias de prueba (sintéticas y, opcionalmente, reales) que permitan analizar el comportamiento de los algoritmos.
+    \item Construir un conjunto de instancias de prueba que permitan ajustar y analizar el comportamiento de los algoritmos.
     \item Comparar experimentalmente las configuraciones propuestas en términos de calidad de la solución, número de consultas al LLM y tiempo de ejecución.
 \end{itemize}
 
@@ -150,105 +141,387 @@ El problema es de naturaleza combinatoria: si se permite cualquier número de pu
 \chapter{Diseño e Implementación}
 
 \section{Modelado formal}
-Sea \(S = (e_1, \dots, e_N)\) la secuencia de entrada. Una segmentación se representa como un vector binario \(\mathbf{x} \in \{0,1\}^{N-1}\), donde \(x_i = 1\) indica que existe un corte entre \(e_i\) y \(e_{i+1}\). El número de segmentos es \(k = 1 + \sum x_i\). La función objetivo es
-\[
-f(\mathbf{x}) = \sum_{j=1}^{k} \phi(\text{seg}_j)
-\]
-siendo \(\phi(s)\) la puntuación de coherencia del segmento \(s\) devuelta por el LLM, normalizada para que valores más altos indiquen mayor coherencia. En las formulaciones sin restricción explícita sobre \(k\), no se añade penalización, pero se puede incorporar un término regularizador en caso necesario. La optimalidad se define como la maximización de \(f\).
 
-\section{Solución exacta: Programación Dinámica}
-Para instancias en las que el coste de evaluar \(\phi\) no sea prohibitivo, se implementa un algoritmo de programación dinámica (DP) que calcula la segmentación óptima en tiempo \(O(N^2 \cdot C)\), donde \(C\) es el coste de una evaluación de coherencia. Se define \(dp[i]\) como la máxima puntuación alcanzable para los primeros \(i\) elementos. La recurrencia es:
+
+Sea la entrada del problema \(S = (e_1, e_2, \dots , e_N)\), una secuencia
+finita de \(N\) elementos textuales. Se desea obtener una segmentación 
+que maximice la suma de las coherencias individuales, sujeta a que los segmentos sean disjuntos, 
+cubran completamente \(S\) y respeten el orden original. \\
+
+Con este fin, se define una segmentación como un vector binario \(\mathbf{x} \in \{0,1\}^{N-1}\), donde \(x_i = 1\) indica que existe un corte entre \(e_i\) y \(e_{i+1}\). El número de segmentos es \(k = 1 + \sum x_i\). Sea la función objetivo:
 \[
-dp[i] = \max_{0 \le j < i} \left( dp[j] + \phi( e_{j+1}\dots e_i ) \right)
+f(\mathbf{x}) = \sum_{j=1}^{k} \phi(s_j)
 \]
-con \(dp[0]=0\). La solución se reconstruye almacenando los puntos de corte óptimos. Este método garantiza optimalidad y se usa como referencia (\textit{ground truth}) para evaluar la calidad de las metaheurísticas en conjuntos pequeños.
+donde \(\phi(s)\) es la puntuación de coherencia del segmento \(s\) devuelta por el LLM, la salida del problema es la segmentación $\mathbf{x}$ que maximiza $f$. \\
+
+Sin embargo, por la naturaleza del dominio del problema y la 
+funci\'on objetivo anterior, la solución para cualquier instancia
+del problema ser\'ia la solución degenerada de cortar cada elemento.
+Por tanto, para capturar el coste de generar más segmentos 
+y penalizar segmentaciones excesivamente fragmentadas,
+la función objrtivo final incorpora un término de penalización (\(\alpha\))
+sobre el número de segmentos:
+\[
+f(\mathbf{x}) = \sum_{j=1}^{k} \phi(s_j) - \alpha \cdot k
+\]
+
+Adicionalmente, los segmentos de longitud uno
+(en lo adelante, segmentos unitarios) 
+reciben una puntuación fija \(\phi_u\).
+Esta parametrización permite ajustar el equilibrio entre 
+coherencia intrasegmental y parsimonia de la partición. \\
+
+
+El problema es de naturaleza combinatoria: si se permite cualquier número de puntos de corte, el espacio de soluciones crece exponencialmente (\(2^{N-1}\)). Por tanto, se investiga una solución exacta de referencia para instancias pequeñas y metaheurísticas capaces de aproximar soluciones buenas limitando el número de evaluaciones del LLM.
+
+
+
+\section{Solución exacta con programación dinámica}
+
+El módulo \texttt{dp.py} implementa  un algoritmo de programación dinámica (DP) que calcula la segmentación óptima. Se define \(dp[i]\) como la máxima puntuación alcanzable para los primeros \(i\) elementos. La recurrencia es:
+\[
+dp[i] = \max_{0 \le j < i} \left( dp[j] + \phi( e_{j+1}\dots e_i ) - \alpha \right)
+\]
+con \(dp[0]=0\). La solución se reconstruye almacenando los puntos de corte óptimos. \\
+
+
+El algoritmo es de complejidad \(O(N^2 \cdot C)\), donde \(C\) es el coste de una evaluación de coherencia. Se utiliza para ajustar los parámetros de la función objetivo, \(\alpha\) y \(\phi_u\), cuando las instancias son lo bastante pequeñas para evaluar exhaustivamente.
 
 \section{Metaheurísticas}
-Dado que el espacio de soluciones crece exponencialmente y cada evaluación de \(\phi\) es costosa (implica una consulta a un modelo de lenguaje), se implementan las siguientes estrategias:
 
-\subsection{Búsqueda local (Hill Climbing)}
-Se parte de una segmentación inicial (por ejemplo, sin cortes o con cortes cada \(m\) elementos). En cada iteración, se genera el vecindario mediante tres operadores elementales: añadir un corte, eliminar un corte y desplazar un corte una posición. Se evalúa el cambio en \(f\) re-evaluando exclusivamente los segmentos afectados. Se aplica el mejor movimiento que mejore la función objetivo, repitiendo hasta un óptimo local. Para mitigar la dependencia del punto de partida, se ejecuta desde múltiples soluciones aleatorias.
+El archivo \texttt{metaheuristics.py} define una jerarquía clara de clases que facilita la extensión y el análisis comparativo.
 
-\subsection{Simulated Annealing (SA)}
-Se utiliza un esquema clásico de enfriamiento. A partir de una solución inicial, se propone un movimiento aleatorio (añadir, eliminar o desplazar un corte). Si el movimiento mejora \(f\), se acepta; si empeora, se acepta con probabilidad \(\exp(-\Delta f / T)\), donde \(T\) es la temperatura. La temperatura se reduce gradualmente según un factor de enfriamiento \(\alpha \in (0,1)\). Se realizan varias cadenas de Markov a cada temperatura para explorar adecuadamente. El SA permite escapar de óptimos locales y ha mostrado buen rendimiento en problemas de segmentación.
+La clase abstracta \texttt{Metaheuristic} obliga a todos los algoritmos a implementar un método \texttt{solve} que retorna la mejor solución, su fitness y un diccionario de estado.
 
-\subsection{Algoritmo genético (AG)}
-Se mantiene una población de \(P\) individuos (vectores binarios). En cada generación se seleccionan padres mediante torneo, se aplica cruce de un punto y mutación (invertir bits con baja probabilidad). La función de aptitud es directamente \(f(\mathbf{x})\). Se incorpora elitismo para conservar la mejor solución. Dado que la evaluación de \(f\) es extremadamente costosa, se implementan dos variantes: (a) evaluación real de toda la población en cada generación (solo asequible para poblaciones pequeñas e instancias cortas), y (b) uso de un sustituto rápido (modelo heurístico basado en embeddings) durante la evolución, reservando la evaluación LLM solo para el individuo final o cada cierto número de generaciones.
+A partir de ella se definen dos plantillas:
+\begin{itemize}
+    \item \texttt{SingleSolutionMetaheuristic}: para algoritmos de búsqueda de trayectoria que trabajan sobre una única solución en cada iteración.
+    \item \texttt{PopulationMetaheuristic}: para algoritmos evolutivos que manejan una población completa.
+\end{itemize}
+
+Ambas plantillas estandarizan el seguimiento de métricas como número de evaluaciones, iteraciones/generaciones y mejor fitness encontrado.
+
+\subsection{Búsqueda local}
+
+Las implementaciones concretas de búsqueda local heredan de \texttt{SingleSolutionMetaheuristic}:
+\begin{itemize}
+    \item \texttt{HillClimbing}: genera un vecino mediante \texttt{problem.get\_neighbor}, acepta únicamente mejoras y detiene la búsqueda tras un número fijo de iteraciones sin mejora.
+    \item \texttt{SimulatedAnnealing}: también usa \texttt{problem.get\_neighbor}, pero acepta soluciones peores según una probabilidad que depende de la temperatura. La temperatura se enfría geométricamente para equilibrar explotación y exploración.
+\end{itemize}
+
+Ambos algoritmos comparten la misma representación de solución binaria y delegan en \texttt{ContentSegmentationProblem} la generación de vecinos y la evaluación.
+
+\subsection{Algoritmo genético}
+
+La clase \texttt{GeneticAlgorithm} hereda de \texttt{PopulationMetaheuristic} y define:
+\begin{itemize}
+    \item inicialización de población con soluciones aleatorias,
+    \item selección por torneo binario,
+    \item cruce de un punto en el vector binario de cortes,
+    \item mutación bit-flip con baja probabilidad,
+    \item reemplazo con elitismo para mantener los mejores individuos.
+\end{itemize}
+
+Esta implementación aprovecha la misma representación binaria y los operadores del problema para que la evolución sea compatible con la función de evaluación basada en LLM.
 
 \section{Integración del LLM}
-El LLM se utiliza exclusivamente como función de evaluación de coherencia. Se accede a través de una API (OpenAI GPT-4, o un modelo local como LLaMA) con temperatura 0 para garantizar determinismo. El \textit{prompt} diseñado es:
 
-\begin{quote}
-\textit{«Evalúa la coherencia temática del siguiente fragmento de texto. Asigna una puntuación entre 1 (completamente incoherente) y 10 (altamente coherente). Responde exclusivamente con el número y, en la línea siguiente, precedida por “EXPLICACIÓN:”, una breve justificación. Texto: \{segmento\}»}
-\end{quote}
-
-La respuesta se analiza mediante expresiones regulares para extraer la puntuación. Si no se puede parsear, se reintenta la llamada o se asigna un valor por defecto.
-
-Para minimizar las consultas redundantes, se implementa una tabla de caché (hash) que almacena los resultados de cada segmento evaluado, indexado por su contenido textual. Adicionalmente, se ha explorado un filtro previo basado en similitud coseno entre embeddings (Sentence-BERT) para identificar fronteras naturales y descartar segmentos incoherentes sin necesidad de consultar al LLM, acelerando la búsqueda.
-
-\section{Arquitectura del sistema}
-El sistema CohereSeg se ha desarrollado en Python, con una estructura modular:
+La evaluación de coherencia está centralizada en \texttt{llm.py}. Para cada segmento se realiza lo siguiente:
 \begin{itemize}
-    \item \texttt{data\_loader.py}: carga datasets desde archivos JSON/CSV y los convierte en listas de elementos.
-    \item \texttt{coherence.py}: interfaz con el LLM (incluye caché, parseo de respuestas y métrica alternativa basada en embeddings).
-    \item \texttt{dp.py}: implementación de la programación dinámica exacta.
-    \item \texttt{metaheuristics.py}: implementación de Hill Climbing, Simulated Annealing y Algoritmo Genético, con opciones de configuración.
-    \item \texttt{experiment.py}: script principal para lanzar los experimentos, registrar métricas y generar salidas.
+    \item segmentos unitarios reciben una coherencia fija (valor \texttt{unit\_coherence}), evitando llamadas innecesarias al modelo;
+    \item para segmentos mayores se construye un prompt que solicita una puntuación entre 0 y 1;
+    \item la respuesta se parsea a número decimal y se guarda en caché en \texttt{data/llm\_cache.json};
+    \item ante errores de API (por ejemplo 429) se aplica reintento exponencial y rotación de credenciales.
 \end{itemize}
-La configuración (rutas, claves de API, parámetros de los algoritmos) se gestiona mediante un archivo de configuración YAML.
 
-\chapter{Metodología Experimental}
+El uso de caché es crítico para amortiguar el coste de las evaluaciones repetidas en las metaheurísticas y para permitir comparaciones fiables entre configuraciones.
 
 \section{Dataset}
-Se han construido dos conjuntos de instancias:
-
-\subsection{Dataset sintético}
-Se ha diseñado un generador paramétrico que crea secuencias de longitud variable con una segmentación de referencia conocida. Se definen varios temas, cada uno con un vocabulario característico y un conjunto de plantillas de frases. La secuencia se forma concatenando bloques de frases de un mismo tema, y se insertan fronteras conocidas. Además, se introduce ruido (frases de transición) para hacer la tarea no trivial. Las ventajas de este dataset son: (1) se dispone de la segmentación verdadera, lo que permite evaluar con métricas externas; (2) se controlan parámetros como la longitud, la nitidez de las fronteras y el número de cambios temáticos. Se han generado 50 instancias con N entre 20 y 150 elementos.
-
-\subsection{Dataset real (optativo)}
-Se incluyen transcripciones de vídeos educativos (charlas TED) segmentadas manualmente por secciones según el índice del orador. Las secuencias se dividen en oraciones y la tarea es recuperar la partición original. Este conjunto sirve para validar el comportamiento en entornos más realistas.
-
-\section{Configuraciones evaluadas}
-Se comparan las siguientes variantes:
-\begin{enumerate}
-    \item \textbf{DP-Exacto}: solución exacta mediante programación dinámica, evaluable solo en instancias con \(N\le 50\).
-    \item \textbf{HC}: Hill Climbing con arranques múltiples (5 reinicios aleatorios).
-    \item \textbf{SA}: Simulated Annealing con enfriamiento geométrico (\(\alpha = 0.95\), temperatura inicial 10).
-    \item \textbf{AG}: Algoritmo Genético con sustituto de embeddings (población 20, 50 generaciones, sin evaluar con LLM hasta el final).
-    \item \textbf{SA+Cache}: Simulated Annealing con caché de evaluaciones LLM activado.
-    \item \textbf{AG-Real}: AG con evaluación LLM en todas las generaciones (solo para instancias cortas, como referencia de coste).
-\end{enumerate}
-
-Para cada variante y dataset se mide el rendimiento promediando 5 ejecuciones independientes.
-
-\section{Métricas de evaluación}
-\begin{itemize}
-    \item \textbf{Puntuación total (\(\bar{f}\))}: media de la función objetivo alcanzada (escala LLM normalizada 0-1).
-    \item \textbf{Número de consultas al LLM}: indicador de eficiencia y coste.
-    \item \textbf{Tiempo de ejecución} (segundos).
-    \item \textbf{Precisión de fronteras}: sobre el dataset sintético con segmentación conocida, se calcula el coeficiente de similitud de ventana (\textit{WindowDiff}) y la distancia de segmentación \(P_k\), que comparan las fronteras predichas con las reales.
-    \item \textbf{Tasa de acierto en el óptimo}: para instancias pequeñas donde se conoce el óptimo exacto (DP), se reporta la frecuencia con la que la metaheurística alcanza dicha solución.
-\end{itemize}
-
-\section{Entorno de ejecución}
-Los experimentos se realizan en una máquina con CPU Intel i7, 16 GB RAM, usando Python 3.10. Las llamadas al LLM se efectúan a través de la API de OpenAI con el modelo \texttt{gpt-3.5-turbo} (por economía) o un modelo local \texttt{Llama 3} de 8B parámetros para experimentos sin restricciones de red. Se fija la semilla aleatoria para reproducibilidad.
 
 \chapter{Resultados y Análisis}
 
-\section{Resultados cuantitativos}
-[Aquí se insertarán las tablas con los valores medios de cada métrica para las distintas configuraciones y datasets. Se incluirán gráficas de convergencia (evolución de la función objetivo frente a evaluaciones del LLM) y diagramas de caja comparando la calidad final de las metaheurísticas.]
+En este capítulo se presentan los experimentos realizados para abordar el problema de segmentación de texto basada en coherencia semántica. El objetivo es maximizar la coherencia interna de los segmentos mediante un modelo de lenguaje de gran tamaño (LLM). Se llevaron a cabo tres experimentos principales: (1) ajuste de la función objetivo, (2) ajuste de hiperparámetros de las metaheurísticas y (3) evaluación comparativa de las metaheurísticas sobre instancias de prueba. Se utilizaron tres instancias de validación (con \(n = 20, 15, 20\) elementos) para el ajuste, y cinco instancias de prueba (todas con \(n = 20\) elementos) para la evaluación final. La métrica principal fue el puntaje \(F_1\) entre los cortes predichos y los reales. Previamente, se precomputaron los valores de coherencia de todos los segmentos de las instancias de validación para acelerar las evaluaciones.
 
-\subsection{Comparación de metaheurísticas}
-Se observa que Simulated Annealing (SA+Cache) alcanza consistentemente puntuaciones cercanas al óptimo exacto en instancias pequeñas, superando a Hill Climbing, que se estanca en óptimos locales. El AG con sustituto logra una buena aproximación reduciendo drásticamente las llamadas al LLM, aunque con una ligera pérdida de calidad en fronteras difusas.
+\section{Experimento 1: Ajuste de la función objetivo}
 
-\subsection{Eficiencia en el uso del LLM}
-La caché reduce el número de consultas en un 40-60\%, ya que muchos segmentos se repiten durante la búsqueda. El filtro previo con embeddings descarta hasta un 30\% de evaluaciones innecesarias sin impacto significativo en la calidad final.
+\subsection{Objetivo}
+Determinar los valores óptimos de los parámetros de la función objetivo: la coherencia unitaria \(\gamma\) (valor asignado a segmentos de un solo elemento) y el factor de penalización \(\alpha\) por cada segmento.
 
-\subsection{Sensibilidad al diseño del prompt}
-Se probaron variantes del prompt (sin solicitar explicación, pidiendo un desglose numérico) y se observó una variabilidad mínima en la puntuación final, siempre que el LLM respondiese con un formato analizable. Incluir la explicación breve no alargó significativamente la generación y mejoró la tasa de respuestas parseables.
+\subsection{Función objetivo propuesta}
+La función de fitness para una partición \(S = \{s_1, s_2, \dots, s_k\}\) de la secuencia de \(n\) elementos se define como:
+\[
+f(S) = \sum_{s \in S} \max\bigl(\text{coherencia}(s), \gamma\bigr) - \alpha \cdot |S|
+\]
+donde \(\text{coherencia}(s)\) es la cohesión semántica del segmento \(s\) evaluada por el LLM (en un rango aproximado de \(0\) a \(1\)), \(\gamma\) es un valor mínimo para segmentos de un solo elemento y \(\alpha\) controla la penalización por número de segmentos.
 
-\section{Análisis}
-Las metaheurísticas basadas en búsqueda local se adaptan bien al problema, especialmente cuando se complementan con mecanismos que amortiguan el coste del LLM. Simulated Annealing ofrece la mejor relación calidad–coste, mientras que el AG resulta competitivo si se dispone de un modelo sustituto eficaz. La principal limitación es la dependencia de un LLM externo, que introduce latencia y un coste monetario que impide escalar a instancias muy largas con evaluación completa.
+\subsection{Metodología}
+Se realizó una búsqueda en cuadrícula variando \(\gamma \in [0.0, 1.0]\) con paso \(0.1\) y \(\alpha \in [0.0, 1.0]\) con paso \(0.1\). Para cada combinación se ejecutó un algoritmo de programación dinámica (solución exacta) sobre las tres instancias de validación, calculando el \(F_1\) respecto a los cortes reales. Se seleccionaron los parámetros que maximizaron el \(F_1\) medio.
+
+\subsection{Resultados esperados}
+\begin{itemize}
+    \item \textbf{Valores altos de \(\gamma\) (coherencia unitaria alta):} se esperaba que provocaran una sobre‐segmentación, ya que los segmentos de un solo elemento serían considerados muy coherentes, lo que aumentaría el número de cortes.
+    \item \textbf{Penalización baja (\(\alpha\) pequeño):} se esperaba que favoreciera particiones con muchos segmentos, mientras que penalizaciones altas (\(\alpha\) grande) desalentarían la creación de segmentos, llevando a particiones más gruesas.
+    \item \textbf{Mejor combinación:} se anticipaba un equilibrio intermedio, probablemente con \(\gamma\) moderado y \(\alpha\) no extremo.
+\end{itemize}
+
+\subsection{Resultados obtenidos}
+Se analizaron tres casos según el nivel de segmentación real de cada instancia.
+
+\paragraph{Caso 1: Segmentación alta (Instancia 1, n=20)}
+La instancia presenta una segmentación fina con muchos cortes. El mapa de calor de la Figura \ref{fig:heatmap1} muestra que el máximo \(F_1\) se alcanza con \(\gamma = 0.6\) y \(\alpha = 1.0\). Penalizaciones bajas producen demasiados cortes, mientras que \(\gamma\) muy alto también incrementa la segmentación.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/exp1_case1.png}
+\caption{Mapa de calor del \(F_1\) medio para la instancia 1.}
+\label{fig:heatmap1}
+\end{figure}
+
+\paragraph{Caso 2: Segmentación media (Instancia 2, n=15)}
+La instancia tiene un número moderado de cortes. De nuevo, la combinación \(\gamma = 0.6\), \(\alpha = 1.0\) es la óptima (Figura \ref{fig:heatmap2}). Se observa que la región de alto \(F_1\) es más amplia que en el caso anterior.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/exp1_case2.png}
+\caption{Mapa de calor del \(F_1\) medio para la instancia 2.}
+\label{fig:heatmap2}
+\end{figure}
+
+\paragraph{Caso 3: Segmentación baja (Instancia 3, n=20)}
+La instancia tiene pocos cortes reales. El óptimo se mantiene en \(\gamma = 0.6\), \(\alpha = 1.0\) (Figura \ref{fig:heatmap3}). Los valores de \(\alpha\) cercanos a \(0\) producen una segmentación excesiva, penalizando el \(F_1\).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/exp1_case3.png}
+\caption{Mapa de calor del \(F_1\) medio para la instancia 3.}
+\label{fig:heatmap3}
+\end{figure}
+
+\subsection{Selección final de parámetros}
+La Tabla \ref{tab:obj_grid} resume los mejores parámetros encontrados para cada instancia. En todos los casos la combinación óptima fue \(\gamma = 0.6\) y \(\alpha = 1.0\). A pesar de que \(\alpha = 1.0\) hace que la función de fitness sea negativa, resultó ser la mejor opción para equilibrar la coherencia y el número de segmentos. Por lo tanto, se fijaron \(\gamma = 0.6\) y \(\alpha = 1.0\) para todos los experimentos posteriores.
+
+\begin{table}[H]
+\centering
+\caption{Mejores parámetros de la función objetivo por instancia de validación}
+\label{tab:obj_grid}
+\begin{tabular}{ccc}
+\toprule
+Instancia & \(\gamma\) óptimo & \(\alpha\) óptimo \\
+\midrule
+1 (n=20, segmentación alta) & 0.6 & 1.0 \\
+2 (n=15, segmentación media) & 0.6 & 1.0 \\
+3 (n=20, segmentación baja) & 0.6 & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Experimento 2: Ajuste de las metaheurísticas}
+
+\subsection{Objetivo}
+Encontrar la configuración de hiperparámetros que maximice el rendimiento de cada metaheurística (Ascenso de colina, Recocido simulado, Algoritmo genético y Enjambre de partículas) sobre el problema de segmentación.
+
+\subsection{Metodología}
+Para cada algoritmo se muestrearon aleatoriamente 10 combinaciones de hiperparámetros dentro de rangos predefinidos. Cada configuración se evaluó sobre la primera instancia de validación (\(n=20\)) con 3 repeticiones. Se midieron el \(F_1\) medio y el fitness real medio (coherencia total menos penalización). Posteriormente se seleccionó la mejor configuración (mayor \(F_1\) medio) y se registró su curva de convergencia.
+
+\subsection{Ascenso de colina (Hill Climbing)}
+
+\begin{itemize}
+    \item \textbf{Rango explorado:} \texttt{stagnation\_limit} $\in \{50,100,150,200\}$, \texttt{max\_evaluations} $\in \{500,1000,5000\}$, \texttt{neighborhood\_size} $\in \{1,3,5\}$.
+    \item \textbf{Muestreo y resultados:} Tabla \ref{tab:hc_results}.
+    \item \textbf{Mejor configuración:} \{\texttt{stagnation\_limit}=150, \texttt{max\_evaluations}=1000, \texttt{neighborhood\_size}=5\} con \(F_1\) medio = 1.0000.
+    \item \textbf{Convergencia:} Figura \ref{fig:hc_convergence}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Resultados del muestreo aleatorio para Hill Climbing}
+\label{tab:hc_results}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Parámetros} & & \textbf{F1 medio} & \textbf{Fitness medio} \\
+\midrule
+\{stagnation\_limit=150, max\_eval=500, neigh=5\} & & 0.8571 & -0.3667 \\
+\{stagnation\_limit=50, max\_eval=5000, neigh=1\} & & 0.7143 & -0.5333 \\
+\{stagnation\_limit=150, max\_eval=1000, neigh=5\} & & 1.0000 & -0.2000 \\
+\{stagnation\_limit=200, max\_eval=500, neigh=3\} & & 1.0000 & -0.2000 \\
+\{stagnation\_limit=200, max\_eval=1000, neigh=1\} & & 0.8571 & -0.3667 \\
+\{stagnation\_limit=150, max\_eval=500, neigh=3\} & & 1.0000 & -0.2000 \\
+\{stagnation\_limit=50, max\_eval=500, neigh=1\} & & 1.0000 & -0.2000 \\
+\{stagnation\_limit=100, max\_eval=1000, neigh=3\} & & 1.0000 & -0.2000 \\
+\{stagnation\_limit=50, max\_eval=500, neigh=5\} & & 0.6190 & -0.5333 \\
+\{stagnation\_limit=50, max\_eval=1000, neigh=5\} & & 1.0000 & -0.2000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/hc_convergence.png}
+\caption{Convergencia del mejor fitness para la mejor configuración de Hill Climbing.}
+\label{fig:hc_convergence}
+\end{figure}
+
+\subsection{Recocido simulado (Simulated Annealing)}
+
+\begin{itemize}
+    \item \textbf{Rango explorado:} \texttt{T0} $\in \{10,50,100\}$, \texttt{alpha} $\in \{0.8,0.9,0.95,0.99\}$, \texttt{iters\_per\_temp} $\in \{5,10,20,50\}$, \texttt{max\_evaluations} $\in \{1000,2000,5000\}$, \texttt{T\_min}=0.001 fijo.
+    \item \textbf{Muestreo y resultados:} Tabla \ref{tab:sa_results}.
+    \item \textbf{Mejor configuración:} \{\texttt{T0}=50.0, \texttt{alpha}=0.9, \texttt{iters\_per\_temp}=5, \texttt{max\_evaluations}=2000\} con \(F_1\) medio = 0.8201.
+    \item \textbf{Convergencia:} Figura \ref{fig:sa_convergence}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Resultados del muestreo aleatorio para Simulated Annealing}
+\label{tab:sa_results}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Parámetros} & & \textbf{F1 medio} & \textbf{Fitness medio} \\
+\midrule
+\{T0=50, alpha=0.9, iters=20, max\_eval=5000\} & & 0.3810 & -0.7000 \\
+\{T0=50, alpha=0.9, iters=20, max\_eval=2000\} & & 0.5820 & -0.6667 \\
+\{T0=10, alpha=0.95, iters=20, max\_eval=1000\} & & 0.4762 & -0.7000 \\
+\{T0=10, alpha=0.99, iters=20, max\_eval=5000\} & & 0.4762 & -0.7000 \\
+\{T0=10, alpha=0.8, iters=20, max\_eval=5000\} & & 0.4762 & -0.7000 \\
+\{T0=50, alpha=0.8, iters=5, max\_eval=2000\} & & 0.6349 & -0.6000 \\
+\{T0=100, alpha=0.9, iters=20, max\_eval=1000\} & & 0.4405 & -0.7667 \\
+\{T0=50, alpha=0.9, iters=5, max\_eval=2000\} & & 0.8201 & -0.5333 \\
+\{T0=100, alpha=0.99, iters=20, max\_eval=5000\} & & 0.4868 & -0.6667 \\
+\{T0=100, alpha=0.9, iters=10, max\_eval=5000\} & & 0.4762 & -0.7000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/sa_convergence.png}
+\caption{Convergencia del mejor fitness para la mejor configuración de Simulated Annealing.}
+\label{fig:sa_convergence}
+\end{figure}
+
+\subsection{Algoritmo genético (Genetic Algorithm)}
+
+\begin{itemize}
+    \item \textbf{Rango explorado:} \texttt{population\_size} $\in \{10,20,50\}$, \texttt{mutation\_rate} $\in \{0.01,0.05,0.1\}$, \texttt{elitism} $\in \{1,3,5\}$, \texttt{max\_generations} $\in \{20,50,100\}$, \texttt{max\_evaluations} $\in \{1000,5000\}$.
+    \item \textbf{Muestreo y resultados:} Tabla \ref{tab:ga_results}.
+    \item \textbf{Mejor configuración:} \{\texttt{population\_size}=50, \texttt{mutation\_rate}=0.05, \texttt{elitism}=1, \texttt{max\_generations}=100, \texttt{max\_evaluations}=5000\} con \(F_1\) medio = 1.0000.
+    \item \textbf{Convergencia:} Figura \ref{fig:ga_convergence}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Resultados del muestreo aleatorio para Algoritmo Genético}
+\label{tab:ga_results}
+\begin{tabular}{llc}
+\toprule
+\textbf{Parámetros} & & \textbf{F1 medio} \\
+\midrule
+\{pop=50, mut=0.05, elit=1, max\_gen=100, max\_eval=5000\} & & 1.0000 \\
+\{pop=10, mut=0.1, elit=5, max\_gen=50, max\_eval=1000\} & & 0.7778 \\
+\{pop=10, mut=0.05, elit=5, max\_gen=50, max\_eval=5000\} & & 0.6778 \\
+\{pop=50, mut=0.05, elit=1, max\_gen=20, max\_eval=5000\} & & 1.0000 \\
+\{pop=50, mut=0.1, elit=3, max\_gen=100, max\_eval=5000\} & & 0.7619 \\
+\{pop=20, mut=0.01, elit=3, max\_gen=100, max\_eval=5000\} & & 0.5464 \\
+\{pop=50, mut=0.05, elit=3, max\_gen=100, max\_eval=1000\} & & 1.0000 \\
+\{pop=20, mut=0.1, elit=5, max\_gen=20, max\_eval=5000\} & & 0.8333 \\
+\{pop=20, mut=0.1, elit=5, max\_gen=50, max\_eval=1000\} & & 0.7619 \\
+\{pop=10, mut=0.05, elit=3, max\_gen=20, max\_eval=5000\} & & 0.6086 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/ga_convergence.png}
+\caption{Convergencia del fitness promedio para la mejor configuración del Algoritmo Genético.}
+\label{fig:ga_convergence}
+\end{figure}
+
+\subsection{Enjambre de partículas (Particle Swarm Optimization)}
+
+\begin{itemize}
+    \item \textbf{Rango explorado:} \texttt{population\_size} $\in \{10,20,50\}$, \texttt{w} $\in \{0.5,0.7,0.9\}$, \texttt{c1} $\in \{1.0,1.5,2.0,2.5\}$, \texttt{c2} $\in \{1.0,1.5,2.0,2.5\}$, \texttt{max\_generations} $\in \{20,50,100\}$, \texttt{max\_evaluations} $\in \{1000,5000\}$, \texttt{v\_max} $\in \{2.0,5.0,10.0\}$.
+    \item \textbf{Muestreo y resultados:} Tabla \ref{tab:pso_results}.
+    \item \textbf{Mejor configuración:} \{\texttt{population\_size}=50, \texttt{w}=0.7, \texttt{c1}=2.0, \texttt{c2}=2.0, \texttt{max\_generations}=100, \texttt{max\_evaluations}=5000, \texttt{v\_max}=5.0\} con \(F_1\) medio = 1.0000.
+    \item \textbf{Convergencia:} Figura \ref{fig:pso_convergence}.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Resultados del muestreo aleatorio para PSO}
+\label{tab:pso_results}
+\begin{tabular}{llc}
+\toprule
+\textbf{Parámetros} & & \textbf{F1 medio} \\
+\midrule
+\{pop=10, w=0.9, c1=2.5, c2=2.0, max\_gen=100, max\_eval=5000, v\_max=2.0\} & & 0.9195 \\
+\{pop=50, w=0.7, c1=1.0, c2=2.0, max\_gen=20, max\_eval=1000, v\_max=10.0\} & & 0.9117 \\
+\{pop=10, w=0.5, c1=2.0, c2=1.5, max\_gen=50, max\_eval=5000, v\_max=2.0\} & & 0.8012 \\
+\{pop=50, w=0.9, c1=1.0, c2=2.5, max\_gen=50, max\_eval=1000, v\_max=2.0\} & & 0.8779 \\
+\{pop=50, w=0.7, c1=1.0, c2=2.0, max\_gen=50, max\_eval=5000, v\_max=2.0\} & & 0.9405 \\
+\{pop=50, w=0.7, c1=2.0, c2=2.0, max\_gen=100, max\_eval=5000, v\_max=5.0\} & & 1.0000 \\
+\{pop=20, w=0.7, c1=1.5, c2=1.0, max\_gen=50, max\_eval=1000, v\_max=5.0\} & & 0.8824 \\
+\{pop=10, w=0.7, c1=1.0, c2=2.0, max\_gen=50, max\_eval=1000, v\_max=5.0\} & & 0.8453 \\
+\{pop=50, w=0.5, c1=1.5, c2=2.5, max\_gen=20, max\_eval=1000, v\_max=5.0\} & & 0.8934 \\
+\{pop=10, w=0.5, c1=1.5, c2=1.5, max\_gen=50, max\_eval=1000, v\_max=2.0\} & & 0.8196 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/pso_convergence.png}
+\caption{Convergencia del mejor fitness para la mejor configuración de PSO.}
+\label{fig:pso_convergence}
+\end{figure}
+
+\section{Experimento 3: Evaluación de las metaheurísticas}
+
+\subsection{Objetivo}
+Comparar el rendimiento de las cuatro metaheurísticas, cada una con su mejor configuración hallada en el Experimento 2, sobre un conjunto de cinco instancias de prueba no vistas durante el ajuste (índices 4 a 8 del conjunto de datos, todas con \(n = 20\) elementos). La métrica principal fue el \(F_1\) medio.
+
+\subsection{Metodología}
+Para cada metaheurística se ejecutó la mejor configuración obtenida en el Experimento 2 sobre cada una de las cinco instancias de prueba, registrando el \(F_1\) y el fitness real. Se reportan la media, desviación estándar, mínimo, máximo y el número promedio de evaluaciones.
+
+\subsection{Resultados esperados}
+\begin{itemize}
+    \item Las metaheurísticas poblacionales (Algoritmo genético y PSO) deberían superar a las de búsqueda local (Hill Climbing y Simulated Annealing) debido a su capacidad para explorar mejor el espacio de búsqueda combinatorio.
+    \item Se esperaba que PSO, al mantener una memoria de las mejores posiciones, fuera especialmente efectivo.
+    \item El recocido simulado podría mostrar una alta variabilidad debido a su dependencia de la temperatura inicial y el enfriamiento.
+\end{itemize}
+
+\subsection{Resultados obtenidos}
+La Tabla \ref{tab:final_results} resume los resultados. El Enjambre de partículas (PSO) alcanzó el mejor \(F_1\) medio (0.9025), seguido muy de cerca por el Algoritmo genético (0.8814). El ascenso de colina obtuvo un rendimiento intermedio (0.7162) y el recocido simulado mostró la mayor variabilidad y el peor valor medio (0.5447).
+
+\begin{table}[H]
+\centering
+\caption{Resultados comparativos sobre las cinco instancias de prueba}
+\label{tab:final_results}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Metaheurística} & \textbf{F1 medio} & \textbf{F1 std} & \textbf{F1 min} & \textbf{F1 max} & \textbf{Evaluaciones} \\
+\midrule
+Particle Swarm Optimization & 0.9025 & 0.0000 & 0.9025 & 0.9025 & 1000 \\
+Genetic Algorithm          & 0.8814 & 0.0000 & 0.8814 & 0.8814 & 1037 \\
+Hill Climbing              & 0.7162 & 0.0000 & 0.7162 & 0.7162 & 496 \\
+Simulated Annealing        & 0.5447 & 0.1316 & 0.3578 & 0.7348 & 246 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La Figura \ref{fig:final_convergence} muestra las curvas de convergencia promediadas de las cuatro metaheurísticas durante sus ejecuciones.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/final_convergence.png}
+\caption{Comparación de las curvas de convergencia (mejor fitness) de las cuatro metaheurísticas sobre las instancias de prueba.}
+\label{fig:final_convergence}
+\end{figure}
+
+\subsection{Conclusiones del experimento 3}
+El Enjambre de partículas resultó ser la metaheurística más efectiva para el problema de segmentación basada en coherencia semántica, logrando un \(F_1\) medio de 0.9025. Su capacidad de equilibrar exploración y explotación, junto con la memoria de las mejores posiciones individuales y globales, le permitió encontrar particiones de alta calidad. El Algoritmo genético también mostró un rendimiento excelente, aunque ligeramente inferior. Las metaheurísticas de búsqueda local se vieron limitadas por la naturaleza multimodal del espacio de búsqueda. Por lo tanto, se selecciona PSO con la configuración encontrada como la estrategia final para el sistema.
+
+
 
 \chapter{Conclusiones}
 
@@ -263,23 +536,9 @@ Se ha cumplido el doble objetivo de aplicar técnicas de búsqueda y optimizaci�
 
 \chapter{Recomendaciones}
 
-\section{Limitaciones del sistema actual}
-\begin{itemize}
-    \item La dependencia de una API externa introduce tiempos de respuesta variables y costes que impiden la ejecución de múltiples iteraciones con presupuesto limitado.
-    \item La métrica de coherencia provista por el LLM puede presentar cierta variabilidad incluso con temperatura cero, y su interpretación se limita a la escala definida en el prompt.
-    \item El enfoque no considera dependencias de larga distancia más allá de la coherencia interna del segmento; segmentos consecutivos podrían ser incoherentes entre sí, lo que requeriría una función de cohesión inter-segmento.
-\end{itemize}
 
-\section{Trabajos futuros}
-\begin{itemize}
-    \item Explorar la cuantificación de la coherencia mediante modelos de lenguaje abiertos ejecutados localmente, reduciendo costes y latencia.
-    \item Incorporar información multimodal (audio, vídeo) aprovechando LLMs capaces de procesar múltiples modalidades, en línea con la fuente original de los fragmentos (vídeos educativos).
-    \item Extender el modelo para penalizar la incoherencia entre segmentos adyacentes, transformándolo en un problema de optimización multiobjetivo.
-    \item Desarrollar un método híbrido que combine DP exacta en ventanas locales con metaheurísticas para instancias largas, aprovechando así la optimalidad de DP sin el coste cuadrático global.
-    \item Automatizar la afinación del prompt según el dominio, utilizando retroalimentación del usuario o un proceso de validación cruzada.
-\end{itemize}
 
-\bibliographystyle{unsrt}
-\bibliography{biblio} 
+% \bibliographystyle{unsrt}
+% \bibliography{biblio} 
 
 \end{document}

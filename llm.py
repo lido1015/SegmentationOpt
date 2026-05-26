@@ -1,139 +1,149 @@
-from __future__ import annotations
-
-import hashlib
-import json
 import os
-import re
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence
-
-try:
-    import openai
-except ImportError:  # pragma: no cover
-    openai = None
-
-try:
-    from sentence_transformers import SentenceTransformer, util
-except ImportError:  # pragma: no cover
-    SentenceTransformer = None
-    util = None
+import json
+import time
+from typing import List
+from google import genai
+from google.genai.errors import APIError
 
 
-@dataclass
-class CoherenceScore:
-    score: float
-    prompt: str
-    response: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+def eval(
+    contents: List[str],
+    cuts: List[int],
+    unit_coherence: float = 0.6,
+    alpha: float = 1.0,
+) -> float:
+    """Evaluates segmentation coherence."""
+    n = len(contents)
+    if len(cuts) != n-1:
+        raise ValueError("cuts must have length n-1")
+
+    seg_ranges = []
+    start = 0
+    for i, cut in enumerate(cuts):
+        if cut == 1:
+            seg_ranges.append((start, i+1))
+            start = i+1
+    seg_ranges.append((start, n))
+
+    total = 0.0
+    for l, r in seg_ranges:
+        total += get_coherence(contents, l, r, unit_coherence=unit_coherence)
+    return total - alpha * len(seg_ranges)
 
 
-class LlmEvaluator:
-    """Interfaz para evaluar la coherencia de un segmento usando un LLM."""
 
-    def __init__(
-        self,
-        model_name: str = "gpt-4",
-        cache_path: Optional[str] = None,
-        use_cache: bool = True,
-        llm_temperature: float = 0.0,
-    ) -> None:
-        self.model_name = model_name
-        self.use_cache = use_cache
-        self.llm_temperature = llm_temperature
-        self.cache_path = Path(cache_path or "llm_cache.json")
-        self.cache: Dict[str, float] = self._load_cache()
+# ---------- Load API keys from keys.txt ----------
+KEYS_FILE = "keys.txt"
+MODEL_NAME = "gemini-3.1-flash-lite"
+CACHE_FILE_LLM = "data/llm_cache.json"
 
-        if openai is not None:
-            self.client = openai
-        else:
-            self.client = None
 
-        self.embedding_model = None
-        if SentenceTransformer is not None:
+def load_api_keys() -> List[str]:
+    """Reads keys.txt and returns a list of non-empty keys."""
+    if not os.path.exists(KEYS_FILE):
+        raise FileNotFoundError(f"Key file {KEYS_FILE} not found")
+    with open(KEYS_FILE, "r", encoding="utf-8") as f:
+        keys = [line.strip() for line in f if line.strip()]
+    if not keys:
+        raise ValueError(f"No valid keys found in {KEYS_FILE}")
+    return keys
+
+API_KEYS = load_api_keys()
+CREDENTIALS = [(key, MODEL_NAME) for key in API_KEYS]   # (api_key, model_name)
+
+_current_cred_index = 0
+
+def get_current_credential():
+    """Returns the current (api_key, model_name) tuple."""
+    return CREDENTIALS[_current_cred_index % len(CREDENTIALS)]
+
+def rotate_credential():
+    """Rotates to the next API key in the list."""
+    global _current_cred_index
+    _current_cred_index += 1
+    print(f"🔄 Rotating credential to index: {_current_cred_index % len(CREDENTIALS)}")
+
+
+
+def get_coherence(
+    contents: List[str],
+    l: int,
+    r: int,
+    unit_coherence: float = 0.6,
+    base_wait: float = 2.0,      
+) -> float:
+    """
+    Evaluates semantic coherence for a segment.
+    
+    Behavior:
+    - Only rotates API key on 429 (Resource Exhausted) errors.
+    - For any error (including 429 and others), uses exponential backoff.
+    - Raises exception only after 5 consecutive errors.
+    """
+    if r - l == 1:
+        return unit_coherence
+
+    segment_text = " ".join(contents[l:r])
+    os.makedirs(os.path.dirname(CACHE_FILE_LLM), exist_ok=True)
+
+    # Load cache
+    cache = {}
+    if os.path.exists(CACHE_FILE_LLM):
+        with open(CACHE_FILE_LLM, "r", encoding="utf-8") as f:
             try:
-                self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-            except Exception:
-                self.embedding_model = None
+                cache = json.load(f)
+            except json.JSONDecodeError:
+                cache = {}
 
-    def _load_cache(self) -> Dict[str, float]:
-        if self.cache_path.exists():
-            try:
-                with open(self.cache_path, encoding="utf-8") as file:
-                    raw = json.load(file)
-                    return {str(k): float(v) for k, v in raw.items()}
-            except Exception:
-                return {}
-        return {}
+    if segment_text in cache:
+        return cache[segment_text]
 
-    def save_cache(self) -> None:
-        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.cache_path, "w", encoding="utf-8") as file:
-            json.dump(self.cache, file, indent=2, ensure_ascii=False)
+    # Prompt remains in Spanish as requested
+    prompt = f"""Evalúa la coherencia semántica del siguiente fragmento de texto en una escala de 0 a 1, donde 0 es completamente incoherente y 1 es perfectamente coherente. Responde ÚNICAMENTE con un número decimal entre 0 y 1.
 
-    def _cache_key(self, text: str) -> str:
-        normalized = " ".join(text.strip().split())
-        return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+            Texto: "{segment_text}"
 
-    def _build_prompt(self, text: str) -> str:
-        return (
-            "Evalúa la coherencia temática del siguiente fragmento de texto. "
-            "Asigna una puntuación entre 1 (completamente incoherente) y 10 (altamente coherente). "
-            "Responde exclusivamente con el número y, en la línea siguiente, precedida por 'EXPLICACIÓN:', una breve justificación. "
-            f"Texto: {text}"
-        )
+            Coherencia:"""
 
-    def _parse_response(self, response: str) -> float:
-        match = re.search(r"([0-9]+(?:\.[0-9]+)?)", response)
-        if not match:
-            raise ValueError(f"No se pudo parsear la puntuación en la respuesta: {response}")
-        score = float(match.group(1))
-        return max(1.0, min(score, 10.0))
+    max_consecutive_errors = 5
+    consecutive_errors = 0
+    attempt = 0   # for exponential backoff
 
-    def _call_llm(self, prompt: str) -> str:
-        if self.client is None:
-            raise RuntimeError(
-                "OpenAI no está disponible. Instala la librería 'openai' y configura OPENAI_API_KEY."
-            )
-        if not os.getenv("OPENAI_API_KEY"):
-            raise RuntimeError("La variable de entorno OPENAI_API_KEY no está definida.")
+    while True:
+        api_key, model_name = get_current_credential()
+        client = genai.Client(api_key=api_key)
 
-        response = self.client.ChatCompletion.create(
-            model=self.model_name,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=self.llm_temperature,
-            max_tokens=100,
-        )
-        return response.choices[0].message.content.strip()
+        try:
+            response = client.models.generate_content(model=model_name, contents=prompt)
+            coherence = float(response.text.strip())
 
-    def score_segment(self, segment: Sequence[str]) -> CoherenceScore:
-        text = " ".join(element.strip() for element in segment if isinstance(element, str))
-        prompt = self._build_prompt(text)
-        key = self._cache_key(text)
+            # Success: store in cache and return
+            cache[segment_text] = coherence
+            with open(CACHE_FILE_LLM, "w", encoding="utf-8") as f:
+                json.dump(cache, f, indent=2, ensure_ascii=False)
+            return coherence
 
-        if self.use_cache and key in self.cache:
-            return CoherenceScore(score=self.cache[key], prompt=prompt, response="cached result")
+        except Exception as e:
+            consecutive_errors += 1
+            wait_time = base_wait * (2 ** attempt)   # exponential backoff
+            is_429 = isinstance(e, APIError) and hasattr(e, 'code') and e.code == 429
 
-        response = self._call_llm(prompt)
-        score = self._parse_response(response)
-        self.cache[key] = score
-        return CoherenceScore(score=score, prompt=prompt, response=response)
+            if is_429:
+                print(f"🛑 [Error 429] Resource exhausted with key {api_key[:8]}... "
+                      f"(failure {consecutive_errors}/{max_consecutive_errors}). "
+                      f"Rotating key and waiting {wait_time:.1f}s")
+                rotate_credential()   # rotate only on 429
+            else:
+                print(f"⚠️ Error ({type(e).__name__}): {str(e)} with key {api_key[:8]}... "
+                      f"(failure {consecutive_errors}/{max_consecutive_errors}). "
+                      f"Retrying with same key in {wait_time:.1f}s")
 
-    def score_segment_by_embedding(self, segment: Sequence[str]) -> CoherenceScore:
-        if self.embedding_model is None or util is None:
-            raise RuntimeError(
-                "Sentence-Transformers no está disponible. Instala 'sentence-transformers' para usar la métrica de embeddings."
-            )
+            if consecutive_errors >= max_consecutive_errors:
+                raise RuntimeError(
+                    f"🚨 {max_consecutive_errors} consecutive failures. "
+                    f"Last error: {e}"
+                )
 
-        text = " ".join(element.strip() for element in segment if isinstance(element, str))
-        sentences = [sentence.strip() for sentence in text.split(".") if sentence.strip()]
-        if len(sentences) < 2:
-            return CoherenceScore(score=1.0, prompt=text, response="segment too short")
-
-        embeddings = self.embedding_model.encode(sentences, convert_to_tensor=True)
-        similarity_matrix = util.pytorch_cos_sim(embeddings, embeddings)
-        upper_triangular = similarity_matrix.triu(diagonal=1)
-        score = float(upper_triangular.mean().item() * 9.0 + 1.0)
-        score = max(1.0, min(score, 10.0))
-
-        return CoherenceScore(score=score, prompt=text, response="embedding coherence")
+            # Exponential backoff before next attempt
+            time.sleep(wait_time)
+            attempt += 1   # increase for next wait

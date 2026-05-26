@@ -10,10 +10,10 @@ Proyecto base para segmentación óptima de contenido basada en coherencia semá
 - `metaheuristics.py`: implementa las bases de Hill Climbing, Simulated Annealing y Algoritmo Genético.
 - `experiments.ipynb`: notebook de ejemplo para ejecutar pruebas y analizar resultados.
 
-## Requisitos opcionales
+## Requisitos
 
 - `openai` para consultas al LLM.
-- `sentence-transformers` para la métrica alternativa de embeddings.
+
 
 ## Uso básico
 

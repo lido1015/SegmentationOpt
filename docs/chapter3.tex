@@ -1,0 +1,83 @@
+% Capítulo 3: Experimentos y resultados
+\chapter{Experimentos y resultados}
+\label{chap:experiments}
+
+En este capítulo se describen los experimentos realizados para ajustar la función objetivo, calibrar las metaheurísticas y comparar su rendimiento en instancias de prueba. Todo el código y las ejecuciones se recogen en el cuaderno \texttt{experiments.ipynb}.
+
+\section{Precomputación de coherencias}
+Para acelerar la búsqueda de parámetros se precomputaron los valores de coherencia de todos los segmentos de las instancias de validación. Esta caché reduce drásticamente el coste de evaluación durante el ajuste de hiperparámetros y las ejecuciones de las metaheurísticas.
+
+\section{Experimento 1: ajuste de la función objetivo}
+\label{sec:exp1}
+Objetivo: seleccionar la combinación de parámetros de la función de evaluación que maximize la métrica F1 sobre instancias pequeñas, resolviendo por programación dinámica para obtener la solución de referencia.
+
+\subsection{Método}
+- Métrica de evaluación: F1 sobre vectores binarios de cortes (también se calcula accuracy y distancia de Hamming como diagnóstico).
+- Parámetros explorados: \texttt{unit\_coherence} (coherencia unitaria) y \texttt{alpha} (penalización por segmento).
+- Búsqueda: rejilla (grid search) con evaluación sobre las instancias de validación usando la solución óptima por programación dinámica.
+
+\subsection{Resultados y decisiones}
+- Se observó que valores altos de coherencia unitaria combinados con bajas penalizaciones por segmento producen resultados pobres.
+- Aunque valores de \texttt{alpha=1} pueden llevar a valores negativos en la función de evaluación, este valor resultó óptimo en las pruebas.
+- Dado que en algunos casos la solución óptima puede incluir segmentos unitarios, se fija por defecto \texttt{unit\_coherence = 0.6} (valor ligeramente coherente). La penalización por segmentos alta evita en la práctica segmentos unitarios indeseados.
+
+\section{Experimento 2: ajuste de parámetros de las metaheurísticas}
+\label{sec:exp2}
+Se calibraron cuatro familias de metaheurísticas: Hill Climbing (HC), Simulated Annealing (SA), Algoritmo Genético (GA) y Particle Swarm Optimization (PSO). El objetivo fue identificar configuraciones con buen compromiso entre calidad (F1) y coste computacional.
+
+\subsection{Configuración experimental}
+- Para cada familia se definió un espacio de parámetros (rejilla) y se muestrearon configuraciones aleatorias. Cada configuración se evaluó repetidas veces sobre la primera instancia de validación para estimar su rendimiento medio.
+- Parámetros evaluados (ejemplos):
+  - HC: \texttt{stagnation\_limit}, \texttt{max\_evaluations}, \texttt{neighborhood\_size}.
+  - SA: \texttt{T0}, \texttt{alpha}, \texttt{iters\_per\_temp}, \texttt{max\_evaluations} (con \texttt{T\_min} fijo).
+  - GA: \texttt{population\_size}, \texttt{mutation\_rate}, \texttt{elitism}, \texttt{max\_generations}.
+  - PSO: \texttt{population\_size}, \texttt{w}, \texttt{c1}, \texttt{c2}, \texttt{v\_max}, \texttt{max\_generations}.
+
+\subsection{Procedimiento}
+- Para cada muestra de parámetros se ejecuta la metaheurística con varias repeticiones; se registra la historia de convergencia, F1 por réplica y estadísticas (media, desviación).
+- Se selecciona la mejor configuración por media de F1 para cada familia y se extraen curvas de convergencia promedio.
+
+\section{Experimento 3: evaluación comparativa}
+\label{sec:exp3}
+Con las mejores configuraciones obtenidas en el Experimento 2, se evaluaron las cuatro metaheurísticas sobre el conjunto de prueba (instancias 4–8, índices 3–7 del dataset). Se comparó la media de F1 para seleccionar la estrategia final.
+
+\subsection{Resultados resumidos}
+Se construyó una tabla resumen con las métricas por metaheurística: F1 medio, F1 (desviación), mínimo, máximo y número promedio de evaluaciones. Además se generaron gráficos de convergencia promediados para comparar la dinámica de búsqueda.
+
+\begin{table}[ht]
+  \centering
+  \caption{Resumen de resultados en instancias de prueba (Experimento 3).}
+  \label{tab:exp3_summary}
+  % Sustituir la siguiente tabla por los valores reales generados en \texttt{experiments.ipynb}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Metaheurística & F1-medio & F1-std & F1-min & F1-max \\
+    \midrule
+    Hill Climbing & -- & -- & -- & -- \\
+    Simulated Annealing & -- & -- & -- & -- \\
+    Genetic Algorithm & -- & -- & -- & -- \\
+    Particle Swarm Optimization & -- & -- & -- & -- \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+  \centering
+  % Inserte aquí el PDF/PNG generado por el cuaderno con la comparación de convergencia
+  \caption{Convergencia promediada: comparación de metaheurísticas (Experimento 3).}
+  \label{fig:convergence_compare}
+\end{figure}
+
+\subsection{Conclusión del experimento comparativo}
+La metaheurística ganadora es la que alcanza la mayor media de F1 en las instancias de prueba (ver Tabla \ref{tab:exp3_summary}). En el cuaderno se imprimió explícitamente la mejor estrategia seleccionada automáticamente a partir del resumen.
+
+\section{Decisiones finales y recomendadas}
+- Función objetivo: usar \texttt{unit\_coherence = 0.6} y ajustar \texttt{alpha} según la búsqueda por rejilla (valor candidato observado: \texttt{alpha=1}).
+- Metaheurística: utilizar la estrategia con mayor F1 medio encontrada en el Experimento 3; la elección concreta aparece en el resumen del cuaderno y depende de la ejecución (ver Tabla \ref{tab:exp3_summary}).
+
+\section{Notas para reproducibilidad}
+- Todo el código y los parámetros de ejecución están en \texttt{experiments.ipynb}. Para reproducir los resultados: cargar el dataset con \texttt{data_loader.load_dataset()}, ejecutar la precomputación de coherencias, ejecutar los bloques de ajuste (Experimentos 1 y 2) y finalmente el Experimento 3.
+- Los artefactos útiles (dataframes con resultados, objetos guardados con \%store o archivos de imagen) deben exportarse desde el cuaderno para incluir las tablas y figuras definitivas en este documento.
+
+\vspace{2mm}
+En el siguiente capítulo se detallan las implementaciones algorítmicas y análisis adicionales sobre complejidad y coste computacional.
