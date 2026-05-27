@@ -76,13 +76,14 @@ class SingleSolutionMetaheuristic(Metaheuristic):
     # ------------------------------------------------------------------
     @abstractmethod
     def _generate(self, current: Any) -> Any:
+        """Produce a new candidate solution from the current one."""
         ...
 
     @abstractmethod
     def _accept(self,
                 candidate: Any, candidate_fit: float,
                 current: Any, current_fit: float) -> bool:
-        """Decision. Access self.state if needed."""
+        """Decide whether the candidate should replace the current solution."""
         ...
 
     @abstractmethod
@@ -129,12 +130,6 @@ class SingleSolutionMetaheuristic(Metaheuristic):
                 best_fit = current_fit
                 self.state["best_fitness"] = best_fit
 
-            if verbose and self.state["iteration"] % 1 == 0:
-                print(f"Iter {self.state['iteration']}: "
-                      f"best={best_fit:.4f}  solution={best}")
-
-
-
         return best, best_fit, self.state
 
 
@@ -178,14 +173,17 @@ class PopulationMetaheuristic(Metaheuristic):
     # ------------------------------------------------------------------
     @abstractmethod
     def _initialize_population(self) -> Tuple[List[Any], List[float]]:
+        """Create and evaluate the initial population."""
         ...
 
     @abstractmethod
     def _select(self, population: List[Any], fitness: List[float]) -> List[Any]:
+        """Choose parent solutions for breeding or update."""
         ...
 
     @abstractmethod
     def _breed(self, selected: List[Any]) -> List[Any]:
+        """Generate offspring from selected parents."""
         ...
 
     @abstractmethod
@@ -194,6 +192,7 @@ class PopulationMetaheuristic(Metaheuristic):
                  fitness: List[float],
                  children: List[Any],
                  children_fitness: List[float]) -> Tuple[List[Any], List[float]]:
+        """Replace the current population with a new one."""
         ...
 
     @abstractmethod
@@ -238,10 +237,6 @@ class PopulationMetaheuristic(Metaheuristic):
                 best_fit = fitness[current_best_idx]
                 self.state["best_fitness"] = best_fit
 
-            if verbose and self.state["generation"] % 10 == 0:
-                print(f"Gen {self.state['generation']}: "
-                      f"best={best_fit:.4f}  evals={self.state['evaluations']}")
-
 
         return best, best_fit, self.state
 
@@ -251,31 +246,37 @@ class PopulationMetaheuristic(Metaheuristic):
 # =============================================================================
 
 class HillClimbing(SingleSolutionMetaheuristic):
-    """Hill climbing with first_improvement and stagnation limit."""
+    """Hill climbing with first-improvement search and stagnation control."""
 
     def __init__(self, stagnation_limit: int = 100, max_evaluations: int = 1000, neighborhood_size: int = 1):
+        """Initialize the hill climbing algorithm parameters."""
         self.stagnation_limit = stagnation_limit
         self.max_evaluations = max_evaluations
         self.neighborhood_size = neighborhood_size
 
     def _initialize_state(self) -> Dict[str, Any]:
+        """Extend common state with the last improvement iteration."""
         state = super()._initialize_state()
         state["last_improvement_iter"] = 0
         return state
 
     def _generate(self, current) -> Tuple[Any, float, int]:
+        """Create a neighbor candidate and return its fitness and evaluation count."""
         candidate, candidate_fit = self._problem.get_neighbor(current, self.neighborhood_size)
         return candidate, candidate_fit, self.neighborhood_size
 
     def _accept(self, candidate, candidate_fit, current, current_fit) -> bool:
+        """Accept the candidate if it has higher fitness than the current solution."""
         return candidate_fit > current_fit
 
     def _update_state(self, evaluations_added, candidate, candidate_fit, accepted):
+        """Update state and record the last improvement iteration."""
         super()._update_state(evaluations_added, candidate, candidate_fit, accepted)
         if accepted:
             self.state["last_improvement_iter"] = self.state["iteration"]
 
     def _termination(self) -> bool:
+        """Stop when evaluation or stagnation limits are reached."""
         if self.state["evaluations"] >= self.max_evaluations:
             return True
         if (
@@ -287,7 +288,7 @@ class HillClimbing(SingleSolutionMetaheuristic):
 
 
 class SimulatedAnnealing(SingleSolutionMetaheuristic):
-    """Simulated annealing with geometric cooling."""
+    """Simulated annealing with geometric cooling and probabilistic acceptance."""
 
     def __init__(self,
                  T0: float = 100.0,
@@ -295,6 +296,7 @@ class SimulatedAnnealing(SingleSolutionMetaheuristic):
                  iters_per_temp: int = 10,
                  T_min: float = 1e-3,
                  max_evaluations: int = 10000):
+        """Configure the annealing schedule and stopping criteria."""
         self.T0 = T0
         self.alpha = alpha
         self.iters_per_temp = iters_per_temp
@@ -303,16 +305,19 @@ class SimulatedAnnealing(SingleSolutionMetaheuristic):
 
 
     def _initialize_state(self) -> Dict[str, Any]:
+        """Extend standard state with current temperature and cooling counter."""
         state = super()._initialize_state()
         state["T"] = self.T0
         state["since_last_cooling"] = 0
         return state
 
     def _generate(self, current) -> Tuple[Any, float, int]:
+        """Generate one neighboring candidate for annealing."""
         candidate, candidate_fit = self._problem.get_neighbor(current, 1)
         return candidate, candidate_fit, 1
 
     def _accept(self, candidate, candidate_fit, current, current_fit) -> bool:
+        """Accept the candidate based on Metropolis criterion."""
         delta = candidate_fit - current_fit   # maximisation
         if delta >= 0:
             return True
@@ -322,6 +327,7 @@ class SimulatedAnnealing(SingleSolutionMetaheuristic):
         return random.random() < math.exp(delta / T)
 
     def _update_state(self, evaluations_added, candidate, candidate_fit, accepted):
+        """Update annealing state and apply temperature cooling periodically."""
         super()._update_state(evaluations_added, candidate, candidate_fit, accepted)
         self.state["since_last_cooling"] += 1
         if self.state["since_last_cooling"] >= self.iters_per_temp:
@@ -331,6 +337,7 @@ class SimulatedAnnealing(SingleSolutionMetaheuristic):
                 self.state["T"] = 0.0
 
     def _termination(self) -> bool:
+        """Stop when temperature is too low or evaluation budget is exhausted."""
         return (
             self.state["T"] <= self.T_min or
             self.state["evaluations"] >= self.max_evaluations
@@ -342,7 +349,7 @@ class SimulatedAnnealing(SingleSolutionMetaheuristic):
 # =============================================================================
 
 class GeneticAlgorithm(PopulationMetaheuristic):
-    """Canonical GA with binary tournament, elitism, and always‑applied crossover."""
+    """Canonical GA with binary tournament selection, elitism, and mutation."""
 
     def __init__(self,
                  population_size: int = 100,
@@ -350,6 +357,7 @@ class GeneticAlgorithm(PopulationMetaheuristic):
                  elitism: int = 2,
                  max_generations: int = 500,
                  max_evaluations: int = 10000):
+        """Initialize genetic algorithm parameters."""
         self.pop_size = population_size
         self.mutation_rate = mutation_rate
         self.elitism = elitism
@@ -360,11 +368,13 @@ class GeneticAlgorithm(PopulationMetaheuristic):
     # Primitive implementations
     # ------------------------------------------------------------------
     def _initialize_population(self):
+        """Create the initial population and evaluate each individual."""
         pop = [self._problem.create_solution() for _ in range(self.pop_size)]
         fit = [self._problem.objective_function(ind) for ind in pop]
         return pop, fit
 
     def _select(self, population, fitness):
+        """Select parents by binary tournament for the next breeding step."""
         selected = []
         for _ in range(self.pop_size - self.elitism):
             i, j = random.sample(range(len(population)), 2)
@@ -373,6 +383,7 @@ class GeneticAlgorithm(PopulationMetaheuristic):
         return selected
 
     def _breed(self, selected):
+        """Combine selected parents into offspring and optionally mutate them."""
         children = []
         parents = selected[:]
         random.shuffle(parents)
@@ -399,6 +410,7 @@ class GeneticAlgorithm(PopulationMetaheuristic):
         return children
 
     def _replace(self, population, fitness, children, children_fitness):
+        """Build the new population using elitism and the best children."""
         elite_idx = sorted(range(len(fitness)),
                            key=lambda i: fitness[i], reverse=True)[:self.elitism]
         new_pop = [population[i] for i in elite_idx]
@@ -418,12 +430,14 @@ class GeneticAlgorithm(PopulationMetaheuristic):
         return new_pop, new_fit
 
     def _termination(self) -> bool:
+        """Stop when the generation or evaluation budget is exhausted."""
         return (self.state["generation"] >= self.max_generations or
                 self.state["evaluations"] >= self.max_evals)
 
 
 @dataclass
 class Particle:
+    """Particle state for binary particle swarm optimization."""
     position: List[int]
     velocity: List[float]
     pbest_position: List[int] = field(default_factory=list)
@@ -432,7 +446,7 @@ class Particle:
 
 
 class ParticleSwarmOptimization(PopulationMetaheuristic):
-    """Particle Swarm Optimization for binary problems."""
+    """Particle Swarm Optimization for binary cut-vector problems."""
 
     def __init__(self,
                  population_size: int = 30,
@@ -443,6 +457,7 @@ class ParticleSwarmOptimization(PopulationMetaheuristic):
                  max_evaluations: int = 10000,
                  v_max: float = 6.0 # Max velocity for binary PSO sigmoid
                 ):
+        """Set PSO parameters including inertia, cognitive and social weights."""
         self.pop_size = population_size
         self.max_generations = max_generations
         self.w = w
@@ -452,6 +467,7 @@ class ParticleSwarmOptimization(PopulationMetaheuristic):
         self.v_max = v_max # Max velocity for binary PSO, velocities are clipped to [-v_max, v_max]
 
     def _initialize_state(self) -> Dict[str, Any]:
+        """Extend standard state with global best and particle storage."""
         state = super()._initialize_state()
         state["gbest_position"] = None
         state["gbest_fitness"] = -float('inf')
@@ -459,6 +475,7 @@ class ParticleSwarmOptimization(PopulationMetaheuristic):
         return state
 
     def _initialize_population(self) -> Tuple[List[Any], List[float]]:
+        """Create an initial swarm and evaluate each particle."""
         # Initialize particles and their pbest_positions
         initial_solutions = []
         initial_fitnesses = []
@@ -497,6 +514,7 @@ class ParticleSwarmOptimization(PopulationMetaheuristic):
         return initial_solutions, initial_fitnesses
 
     def _select(self, population: List[Any], fitness: List[float]) -> List[Particle]:
+        """Update the global best and return the current particles for update."""
         # In PSO, selection is implicit in particle updates. We update gbest and return particles for 'breeding'.
         current_gbest_fitness = self.state["gbest_fitness"]
         current_gbest_position = self.state["gbest_position"]
@@ -514,6 +532,7 @@ class ParticleSwarmOptimization(PopulationMetaheuristic):
 
 
     def _breed(self, selected: List[Particle]) -> List[List[int]]:
+        """Update particle velocities and positions using PSO equations."""
         # This is where velocities and positions are updated for each particle
         new_positions = []
         gbest_position = self.state["gbest_position"]
@@ -559,6 +578,7 @@ class ParticleSwarmOptimization(PopulationMetaheuristic):
         children: List[List[int]], # These are the new positions (from _breed) evaluated by solve loop
         children_fitness: List[float]
     ) -> Tuple[List[List[int]], List[float]]:
+        """Update each particle with its new position and personal best."""
 
         updated_population_solutions = []
         updated_population_fitnesses = []
@@ -582,6 +602,7 @@ class ParticleSwarmOptimization(PopulationMetaheuristic):
         return updated_population_solutions, updated_population_fitnesses
 
     def _termination(self) -> bool:
+        """Stop PSO when generation or evaluation limits are reached."""
         return (
             self.state["generation"] >= self.max_generations or
             self.state["evaluations"] >= self.max_evals

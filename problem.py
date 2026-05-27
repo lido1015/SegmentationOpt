@@ -11,56 +11,54 @@ from typing import Any, List, Tuple
 import random
 import math
 
-from llm import eval
+from llm import evaluate_segmentation
 
 
 class Problem(ABC):
     """
-    Abstract representation of the optimisation problem.
+    Abstract representation of the optimization problem.
 
-    All problem‑specific knowledge (solution encoding, evaluation,
-    neighbourhood, genetic operators) is encapsulated here so that
-    metaheuristics remain domain‑independent.
+    All problem-specific knowledge (solution encoding, evaluation,
+    neighborhood generation, and genetic operators) is encapsulated
+    here so that metaheuristics remain domain-independent.
     """
 
     @abstractmethod
     def create_solution(self) -> Any:
-        """Return a new, random or heuristic, feasible solution."""
+        """Generate a feasible solution for the problem."""
         ...
 
     @abstractmethod 
     def objective_function(self, solution: Any) -> float:
-            """
-            Compute the quality of a solution.
-            **The framework assumes maximisation.** If your problem is a
-            minimisation one, either return the negative of the cost or adjust
-            the acceptance rules in the concrete metaheuristic.
-            """
-            ...
+        """Compute the fitness of a candidate solution.
+
+        The metaheuristic framework treats higher values as better.
+        For minimization problems, return the negated cost if needed.
+        """
+        ...
 
     def get_neighbor(self, solution: Any, neighborhood_size: int) -> Any:
-        """
-        Generate a neighbouring solution.
-        Must be implemented if the problem is to be used with
-        single‑solution metaheuristics.
+        """Return a neighboring solution for local search.
+
+        This method is required when using single-solution metaheuristics.
         """
         raise NotImplementedError(
-            "get_neighbor is required for single‑solution methods"
+            "get_neighbor is required for single-solution methods"
         )
 
     def crossover(self, parent1: Any, parent2: Any) -> Tuple[Any, Any]:
-        """
-        Produce two offspring from two parents.
-        Must be implemented for genetic algorithms.
+        """Create two children from two parent solutions.
+
+        This method is used by genetic algorithms.
         """
         raise NotImplementedError(
             "crossover is required for the genetic algorithm"
         )
 
     def mutate(self, solution: Any) -> None:
-        """
-        Apply a small random perturbation **in‑place** to the solution.
-        Must be implemented for genetic algorithms.
+        """Apply a small random perturbation to a solution in place.
+
+        This method is used by genetic operators in population-based search.
         """
         raise NotImplementedError(
             "mutate is required for the genetic algorithm"
@@ -107,45 +105,6 @@ class ContentSegmentationProblem(Problem):
         """
         return [random.randint(0, 1) for _ in range(self.n - 1)]
 
-    # def create_solution(self) -> List[int]:
-    #     """
-    #     Generate a heuristic binary string of length ``n-1``.
-    #     If `randomize` is True, a completely random solution is generated.
-    #     Otherwise, a heuristic solution is generated based on content length.
-    #     """
-    #     if self.n <= 1:
-    #         return []
-
-    #     num_cuts_vector_len = self.n - 1
-    #     cuts = [0] * num_cuts_vector_len
-
-    #     if num_cuts_vector_len == 0:
-    #         return cuts
-
-    #     # Determine 'i' such that 2^(i-1) < num_cuts_vector_len <= 2^i
-    #     # This means i = floor(log2(num_cuts_vector_len)) + 1 based on example
-    #     # Let's adjust based on the user's explicit example:
-    #     # n=2 to 4 -> 0 cuts (i-1 = 0 -> i=1) i.e. num_cuts_vector_len 1-3
-    #     # n=5 to 8 -> 1 cut (i-1 = 1 -> i=2) i.e. num_cuts_vector_len 4-7
-    #     # n=9 to 16 -> 2 cuts (i-1 = 2 -> i=3) i.e. num_cuts_vector_len 8-15
-
-    #     # This pattern matches k = max(0, floor(log2(num_cuts_vector_len)) - 1)
-    #     # for num_cuts_vector_len >= 1. For num_cuts_vector_len=1, floor(log2(1)) = 0, k = -1 -> 0
-    #     # For num_cuts_vector_len=2, floor(log2(2)) = 1, k = 0
-    #     # For num_cuts_vector_len=3, floor(log2(3)) = 1, k = 0
-    #     # For num_cuts_vector_len=4, floor(log2(4)) = 2, k = 1
-
-    #     i_val = math.floor(math.log2(num_cuts_vector_len))
-    #     k_cuts = max(0, i_val - 1)
-
-    #     if k_cuts > 0:
-    #         for j in range(1, k_cuts + 1):
-    #             # Distribute cuts equitably (j / (k_cuts + 1) fractions)
-    #             cut_index = round(num_cuts_vector_len * (j / (k_cuts + 1))) -1 # Adjust for 0-based indexing
-    #             if 0 <= cut_index < num_cuts_vector_len:
-    #                 cuts[cut_index] = 1
-
-    #     return cuts
 
     def objective_function(self, solution: List[int]) -> float:
         """
@@ -163,18 +122,8 @@ class ContentSegmentationProblem(Problem):
                 f"Solution length {len(solution)} does not match "
                 f"expected {self.n - 1}"
             )
-        return eval(self.contents, solution)
+        return evaluate_segmentation(self.contents, solution)
     
-
-    # def get_neighbor(self, solution: List[int]) -> List[int]:
-    #     """
-    #     Create a neighbour by flipping exactly one random cut.
-    #     Returns a new list; the original is not modified.
-    #     """
-    #     neighbor = solution.copy()
-    #     idx = random.randrange(self.n - 1)
-    #     neighbor[idx] = 1 - neighbor[idx]
-    #     return neighbor
 
     def get_neighbor(self, solution: List[int], neighborhood_size: int = 1) -> Tuple[List[int], float]:
         """
@@ -186,8 +135,6 @@ class ContentSegmentationProblem(Problem):
 
         if self.n <= 1:
             return solution.copy(), self.objective_function(solution.copy())
-
-        num_cuts_vector_len = self.n - 1
 
         for _ in range(neighborhood_size):
             candidate_neighbor = solution.copy()

@@ -1,18 +1,30 @@
+"""LLM integration and coherence scoring utilities.
+
+This module provides a cache-backed coherence evaluator for text
+segments and a segmentation scoring helper that combines segment
+coherence values with a penalty for the number of segments.
+"""
+
 import os
 import json
 import time
-from typing import List
+from typing import List, Tuple
 from google import genai
 from google.genai.errors import APIError
 
 
-def eval(
+def evaluate_segmentation(
     contents: List[str],
     cuts: List[int],
     unit_coherence: float = 0.6,
     alpha: float = 1.0,
 ) -> float:
-    """Evaluates segmentation coherence."""
+    """Compute the fitness of a segmentation defined by binary cuts.
+
+    The score is the sum of segment coherence scores minus an
+    alpha penalty per segment. The segmentation is described by a
+    binary list of length n-1 where 1 indicates a boundary.
+    """
     n = len(contents)
     if len(cuts) != n-1:
         raise ValueError("cuts must have length n-1")
@@ -39,7 +51,7 @@ CACHE_FILE_LLM = "data/llm_cache.json"
 
 
 def load_api_keys() -> List[str]:
-    """Reads keys.txt and returns a list of non-empty keys."""
+    """Load all non-empty API keys from the project key file."""
     if not os.path.exists(KEYS_FILE):
         raise FileNotFoundError(f"Key file {KEYS_FILE} not found")
     with open(KEYS_FILE, "r", encoding="utf-8") as f:
@@ -53,12 +65,13 @@ CREDENTIALS = [(key, MODEL_NAME) for key in API_KEYS]   # (api_key, model_name)
 
 _current_cred_index = 0
 
-def get_current_credential():
-    """Returns the current (api_key, model_name) tuple."""
+def get_current_credential() -> Tuple[str, str]:
+    """Return the current API credential tuple (api_key, model_name)."""
     return CREDENTIALS[_current_cred_index % len(CREDENTIALS)]
 
-def rotate_credential():
-    """Rotates to the next API key in the list."""
+
+def rotate_credential() -> None:
+    """Rotate the active API key to the next one in the credentials list."""
     global _current_cred_index
     _current_cred_index += 1
     print(f"🔄 Rotating credential to index: {_current_cred_index % len(CREDENTIALS)}")

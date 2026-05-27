@@ -1,8 +1,13 @@
 \begin{thebibliography}{1}
 
-\bibitem{darwin2004origin}
-Charles Darwin.
-\newblock {\em On the origin of species, 1859}, volume~2.
-\newblock Routledge London, UK:, 2004.
+\bibitem{lamprier2008toward}
+Sylvain Lamprier, Tassadit Amghar, Bernard Levrat, and Fr{\'e}d{\'e}ric Saubion.
+\newblock Toward a more global and coherent segmentation of texts.
+\newblock {\em Applied Artificial Intelligence}, 22(3):208--234, 2008.
+
+\bibitem{talbi2009metaheuristics}
+El-Ghazali Talbi.
+\newblock {\em Metaheuristics: from design to implementation}.
+\newblock John Wiley \& Sons, 2009.
 
 \end{thebibliography}

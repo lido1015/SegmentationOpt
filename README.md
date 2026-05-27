@@ -1,48 +1,50 @@
-# CohereSeg
+# SegmentationOpt
 
-Proyecto base para segmentación óptima de contenido basada en coherencia semántica.
+Proyecto base para la optimización de segmentación de texto mediante coherencia semántica.
 
 ## Estructura del proyecto
 
-- `data_loader.py`: carga datasets desde archivos JSON o CSV y convierte el contenido en listas de elementos.
-- `llm.py`: interfaz con un LLM para evaluar la coherencia de segmentos. Incluye caché local y una métrica alternativa basada en embeddings.
-- `dp.py`: implementa la programación dinámica exacta para encontrar la segmentación óptima.
-- `metaheuristics.py`: implementa las bases de Hill Climbing, Simulated Annealing y Algoritmo Genético.
-- `experiments.ipynb`: notebook de ejemplo para ejecutar pruebas y analizar resultados.
+- `llm.py`: funciones para evaluar la coherencia de segmentos con un LLM externo. Incluye caché local y gestión de claves.
+- `dp.py`: solución exacta por programación dinámica para encontrar la segmentación óptima.
+- `problem.py`: definición de la interfaz `Problem` y el problema concreto de segmentación de contenido.
+- `metaheuristics.py`: implementa plantillas y algoritmos concretos como Hill Climbing, Simulated Annealing, Genetic Algorithm y Particle Swarm Optimization.
+- `experiments.ipynb`: notebook para experimentar y analizar resultados.
 
 ## Requisitos
 
-- `openai` para consultas al LLM.
-
+- `google-genai` o la biblioteca necesaria para acceder a Gemini y otros modelos de Google.
+- Un archivo `keys.txt` con las claves de API válidas, una clave por línea.
 
 ## Uso básico
 
-1. Cargar una secuencia desde un archivo con `DataLoader`.
-2. Evaluar segmentos con `LlmEvaluator`.
-3. Calcular la segmentación exacta con `OptimalSegmentationDP` o buscar aproximaciones con las metaheurísticas.
+1. Preparar una lista de fragmentos de texto.
+2. Crear un `ContentSegmentationProblem` con esos fragmentos.
+3. Usar `dp_solution` para obtener la segmentación exacta o aplicar una metaheurística.
 
 ## Ejemplo rápido
 
 ```python
-from data_loader import DataLoader
-from llm import LlmEvaluator
-from dp import OptimalSegmentationDP
+from problem import ContentSegmentationProblem
+from dp import dp_solution
 from metaheuristics import HillClimbing
 
-loader = DataLoader()
 sequence = ["Fragmento uno.", "Fragmento dos.", "Fragmento tres."]
-evaluator = LlmEvaluator(model_name="gpt-4", cache_path="llm_cache.json")
 
-solver = OptimalSegmentationDP(evaluator)
-cuts, score = solver.solve(sequence)
-print("Cortes:", cuts, "Puntuación:", score)
+# Segmentación exacta con programación dinámica
+cuts, score = dp_solution(sequence, unit_coherence=1.0, alpha=0.5)
+print("Cortes exactos:", cuts)
+print("Puntuación:", score)
 
-hc = HillClimbing(evaluator)
-solution = hc.optimize(sequence)
-print(solution)
+# Optimización aproximada con Hill Climbing
+problem = ContentSegmentationProblem(sequence)
+solver = HillClimbing(stagnation_limit=50, max_evaluations=500, neighborhood_size=2)
+best_solution, best_score, state = solver.solve(problem, verbose=True)
+print("Cortes aproximados:", best_solution)
+print("Puntuación:", best_score)
 ```
 
 ## Notas
 
-- Configure `OPENAI_API_KEY` para usar el LLM de OpenAI.
-- La caché se guarda en `llm_cache.json`.
+- El archivo `keys.txt` debe contener las claves de acceso para la API de LLM.
+- La caché de evaluaciones se guarda en `data/llm_cache.json`.
+- `dp_solution` opera sobre una lista de fragmentos y retorna un vector de cortes binario.
