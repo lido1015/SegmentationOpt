@@ -84,15 +84,15 @@ class ContentSegmentationProblem(Problem):
         random_seed: optional seed for reproducible random numbers.
     """
 
-    def __init__(self, contents: List[str]):
+    def __init__(self, contents: List[str], unit_coherence: float = 0.6, alpha: float = 1.0):
         self.contents = contents
         self.n = len(contents)
+        self.unit_coherence = unit_coherence
+        self.alpha = alpha
         if self.n < 2:
             raise ValueError(
                 "At least two fragments are required to define cuts."
             )
-
-  
 
     # -----------------------------------------------------------------
     # Implementation of Problem interface
@@ -122,7 +122,12 @@ class ContentSegmentationProblem(Problem):
                 f"Solution length {len(solution)} does not match "
                 f"expected {self.n - 1}"
             )
-        return evaluate_segmentation(self.contents, solution)
+        return evaluate_segmentation(
+            self.contents,
+            solution,
+            unit_coherence=self.unit_coherence,
+            alpha=self.alpha,
+        )
     
 
     def get_neighbor(self, solution: List[int], neighborhood_size: int = 1) -> Tuple[List[int], float]:

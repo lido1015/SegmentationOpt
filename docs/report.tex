@@ -130,7 +130,7 @@ En este proyecto se trata la segmentación como un problema de optimización com
 Se plantean los siguientes objetivos:
 \begin{itemize}
     \item Formalizar el problema de segmentación óptima basada en coherencia.
-    \item Implementar una solución exacta con programación dinámica que sirva como referencia para ajustar parámetros del problema.
+    \item Implementar una solución exacta que sirva como referencia para ajustar parámetros del problema.
     \item Desarrollar metaheurísticas que exploren el espacio de segmentaciones utilizando al LLM como función de coste.
     \item Diseñar un mecanismo de interacción con el LLM que incluya un \textit{prompt} robusto, caché de evaluaciones y estrategias para reducir el número de llamadas.
     \item Construir un conjunto de instancias de prueba que permitan ajustar y analizar el comportamiento de los algoritmos.
@@ -153,7 +153,7 @@ f(\mathbf{x}) = \sum_{j=1}^{k} \phi(s_j)
 \]
 donde \(\phi(s)\) es la puntuación de coherencia del segmento \(s\) devuelta por el LLM; la salida del problema es la segmentación \(\mathbf{x}\) que maximiza \(f\). \\
 
-Sin embargo, por la naturaleza del dominio y la función objetivo anterior, la solución para cualquier instancia sería la solución degenerada de cortar cada elemento. Por tanto, capturar el coste de generar más segmentos y penalizar segmentaciones excesivamente fragmentadas, la función objetivo final incorpora un término de penalización \(\alpha\) sobre el número de segmentos:
+Sin embargo, por la naturaleza del dominio y la función objetivo anterior, la solución para cualquier instancia sería la solución degenerada de cortar cada elemento. Por tanto, para capturar el coste de generar más segmentos y penalizar segmentaciones excesivamente fragmentadas, la función objetivo final incorpora un término de penalización \(\alpha\) sobre el número de segmentos:
 \[
 f(\mathbf{x}) = \sum_{j=1}^{k} \phi(s_j) - \alpha \cdot k
 \]
@@ -377,10 +377,10 @@ La evaluación se apoya en la API de Google GenAI, utilizando el modelo \texttt{
 Puesto que las claves de API son información sensible que no debe publicarse en repositorios, cada usuario debe proporcionar sus propias credenciales en un archivo \texttt{keys.txt} ubicado en la raíz del proyecto, donde cada línea contiene una clave válida.
 La rotación entre claves se activa exclusivamente cuando se recibe un error 429 (Resource Exhausted), lo que permite continuar las consultas sin interrupción y sin intervención manual. \\
 
-La función \texttt{get\_coherence(contents, l, r, unit\_coherence)} sigue el siguiente procedimiento:
+La función \texttt{get\_coherence} sigue el siguiente procedimiento:
 
 \begin{itemize}
-    \item Si el segmento está formado por un único elemento textual, se devuelve el valor fijo \texttt{unit\_coherence} ($\phi_u$).
+    \item Si el segmento está formado por un único elemento textual, se devuelve el valor fijo $\phi_u$.
     \item Para segmentos de longitud mayor que uno, se construye el texto concatenando los fragmentos correspondientes y se comprueba si ya existe una entrada en la caché persistente (\texttt{data/llm\_cache.json}). En caso afirmativo, se retorna el valor almacenado.
         \item Si el segmento no está en caché, se elabora un \textit{prompt} en español que solicita explícitamente una puntuación numérica entre 0 y 1. El \textit{prompt} utilizado es:
 
@@ -406,217 +406,250 @@ Se dispone de un conjunto de 8 instancias etiquetadas, cada una compuesta por un
     \item \textbf{Instancias de prueba (5 restantes)}: Se reservan para la evaluación final del rendimiento de las metaheurísticas con sus mejores configuraciones.
 \end{itemize}
 
-Cada instancia contiene la segmentación de referencia (cortes verdaderos) que permite calcular la métrica \(F_1\) y evaluar la calidad de las soluciones propuestas. El número total de evaluaciones del LLM se controla mediante la caché y los límites de evaluaciones en cada metaheurística.
+Las secuencias textuales y sus correspondientes segmentaciones óptimas fueron generadas por el modelo de lenguaje DeepSeek, solicitándole explícitamente fragmentos con cambios temáticos internos que dieran lugar a segmentos naturales de diferente longitud y cohesión semántica, y que además proporcionara la división correcta. De esta forma se obtuvieron colecciones de 20 fragmentos con entre 2 y 12 segmentos implícitos, junto con la segmentación de referencia. Posteriormente, dos anotadores humanos independientes revisaron cada instancia para confirmar que la segmentación propuesta por el modelo reflejaba fielmente la estructura lógica del contenido. Este proceso de verificación garantiza que las etiquetas de referencia sean fiables y que las instancias capturen de manera realista la tarea de segmentación. \\
+
+
+A pesar de su tamaño reducido, el conjunto de instancias abarca una variedad suficiente de casos (segmentos unitarios, segmentos largos, transiciones abruptas y difusas) para poner a prueba tanto la función de evaluación como los distintos comportamientos de búsqueda de las metaheurísticas. La presencia de las segmentaciones de referencia permite medir de forma objetiva la calidad de las soluciones encontradas, y la división en validación y prueba asegura que los hiperparámetros no se sobreajusten a los datos de evaluación. \\
+
+
+Idealmente se dispondría de un número mucho mayor de instancias y de secuencias de texto más extensas, lo que permitiría una evaluación más robusta y una mayor confianza en las conclusiones. Sin embargo, la dependencia del sistema de un LLM externo, junto con las restricciones operativas del entorno de desarrollo que imponen límites prácticos al número de llamadas a la API y a la duración de las ejecuciones, impidió experimentar con conjuntos de datos de mayor escala. Aun así, el dataset actual cumple con el propósito de validar la arquitectura del \textit{framework} y comparar el desempeño relativo de las metaheurísticas implementadas.
+
+
+
+\chapter{Experimentos y Resultados}
 
 \medskip
 \noindent
-\textbf{Generación y validación del dataset.}
-Las secuencias textuales fueron generadas por el modelo de lenguaje DeepSeek, solicitándole explícitamente fragmentos con cambios temáticos internos que dieran lugar a segmentos naturales de diferente longitud y cohesión semántica. De esta forma se obtuvieron colecciones de 20 fragmentos que contenían entre 2 y 5 segmentos implícitos. Posteriormente, dos anotadores humanos independientes revisaron cada instancia y determinaron, de común acuerdo, la segmentación óptima que mejor reflejaba la estructura lógica del contenido. Este proceso de doble validación garantiza que las etiquetas de referencia sean fiables y que las instancias capturen de manera realista la tarea de segmentación de contenido.
+\textbf{Métrica de evaluación.}
+Para medir la calidad de una segmentación propuesta frente a la segmentación de referencia se utiliza la medida \(F_1\), habitual en tareas de clasificación binaria. Dada una solución como vector de cortes \(\mathbf{c} \in \{0,1\}^{N-1}\), se definen:
+\begin{itemize}
+    \item Verdaderos positivos (\(VP\)): cortes que aparecen tanto en la solución como en la referencia.
+    \item Falsos positivos (\(FP\)): cortes predichos que no están en la referencia.
+    \item Falsos negativos (\(FN\)): cortes de la referencia omitidos en la solución.
+\end{itemize}
+La precisión es \(P = VP/(VP+FP)\), la exhaustividad \(R = VP/(VP+FN)\), y la puntuación \(F_1\) se calcula como su media armónica:
+\[
+F_1 = 2 \cdot \frac{P \cdot R}{P + R},
+\]
+asignando \(F_1 = 0\) cuando no hay ningún corte real ni predicho. Esta métrica resume en un solo valor el equilibrio entre la capacidad de detectar los cortes correctos y la de evitar cortes espurios, lo que la hace especialmente adecuada para comparar soluciones de segmentación.
 
-\medskip
-\noindent
-\textbf{Justificación de la adecuación del dataset.}
-A pesar de su tamaño reducido, el conjunto de instancias abarca una variedad suficiente de casos (segmentos unitarios, segmentos largos, transiciones abruptas y difusas) para poner a prueba tanto la función de evaluación como los distintos comportamientos de búsqueda de las metaheurísticas. La presencia de las segmentaciones de referencia permite medir de forma objetiva la calidad de las soluciones encontradas, y la división en validación y prueba asegura que los hiperparámetros no se sobreajusten a los datos de evaluación.
-
-\medskip
-\noindent
-\textbf{Limitaciones y perspectivas.}
-Idealmente se dispondría de un número mucho mayor de instancias y de secuencias de texto más extensas, lo que permitiría una evaluación más robusta y una mayor confianza en las conclusiones. Sin embargo, la dependencia del sistema de un LLM externo, junto con las restricciones operativas del entorno de desarrollo —que imponen límites prácticos al número de llamadas a la API y a la duración de las ejecuciones—, impidió experimentar con conjuntos de datos de mayor escala. Aun así, el dataset actual cumple con el propósito de validar la arquitectura del \textit{framework} y comparar el desempeño relativo de las metaheurísticas implementadas.
-
-\chapter{Resultados y Análisis}
-
-En este capítulo se presentan los experimentos realizados para abordar el problema de segmentación de texto basada en coherencia semántica. El objetivo es maximizar la coherencia interna de los segmentos mediante un modelo de lenguaje de gran tamaño (LLM). Se llevaron a cabo tres experimentos principales: (1) ajuste de la función objetivo, (2) ajuste de hiperparámetros de las metaheurísticas y (3) evaluación comparativa de las metaheurísticas sobre instancias de prueba. Se utilizaron tres instancias de validación (con \(n = 20, 15, 20\) elementos) para el ajuste, y cinco instancias de prueba (todas con \(n = 20\) elementos) para la evaluación final. La métrica principal fue el puntaje \(F_1\) entre los cortes predichos y los reales. Previamente, se precomputaron los valores de coherencia de todos los segmentos de las instancias de validación para acelerar las evaluaciones.
 
 \section{Experimento 1: Ajuste de la función objetivo}
 
-\subsection{Objetivo}
-Determinar los valores óptimos de los parámetros de la función objetivo: la coherencia unitaria \(\gamma\) (valor asignado a segmentos de un solo elemento) y el factor de penalización \(\alpha\) por cada segmento.
+\medskip
+\noindent
+\textbf{Objetivo.}
+Determinar los valores óptimos de los parámetros de la función objetivo: la coherencia unitaria \(\phi_u\) (valor asignado a segmentos de un solo elemento) y el factor de penalización \(\alpha\) por cada segmento.
 
-\subsection{Función objetivo propuesta}
-La función de fitness para una partición \(S = \{s_1, s_2, \dots, s_k\}\) de la secuencia de \(n\) elementos se define como:
-\[
-f(S) = \sum_{s \in S} \max\bigl(\text{coherencia}(s), \gamma\bigr) - \alpha \cdot |S|
-\]
-donde \(\text{coherencia}(s)\) es la cohesión semántica del segmento \(s\) evaluada por el LLM (en un rango aproximado de \(0\) a \(1\)), \(\gamma\) es un valor mínimo para segmentos de un solo elemento y \(\alpha\) controla la penalización por número de segmentos.
+\medskip
+\noindent
+\textbf{Metodología.}
+Se realizó una búsqueda en cuadrícula variando \(\phi_u \in [0, 1]\) con paso \(0.1\) y \(\alpha \in [0, 1]\) con paso \(0.1\). Para cada combinación se ejecutó un algoritmo de programación dinámica (solución exacta) sobre las tres instancias de validación, calculando el \(F_1\) respecto a los cortes reales. Se seleccionaron los parámetros que maximizaron el \(F_1\) promedio.
 
-\subsection{Metodología}
-Se realizó una búsqueda en cuadrícula variando \(\gamma \in [0.0, 1.0]\) con paso \(0.1\) y \(\alpha \in [0.0, 1.0]\) con paso \(0.1\). Para cada combinación se ejecutó un algoritmo de programación dinámica (solución exacta) sobre las tres instancias de validación, calculando el \(F_1\) respecto a los cortes reales. Se seleccionaron los parámetros que maximizaron el \(F_1\) medio.
-
-\subsection{Resultados esperados}
-\begin{itemize}
-    \item \textbf{Valores altos de \(\gamma\) (coherencia unitaria alta):} se esperaba que provocaran una sobre‐segmentación, ya que los segmentos de un solo elemento serían considerados muy coherentes, lo que aumentaría el número de cortes.
-    \item \textbf{Penalización baja (\(\alpha\) pequeño):} se esperaba que favoreciera particiones con muchos segmentos, mientras que penalizaciones altas (\(\alpha\) grande) desalentarían la creación de segmentos, llevando a particiones más gruesas.
-    \item \textbf{Mejor combinación:} se anticipaba un equilibrio intermedio, probablemente con \(\gamma\) moderado y \(\alpha\) no extremo.
-\end{itemize}
-
-\subsection{Resultados obtenidos}
-Se analizaron tres casos según el nivel de segmentación real de cada instancia.
-
-\paragraph{Caso 1: Segmentación alta (Instancia 1, n=20)}
-La instancia presenta una segmentación fina con muchos cortes. El mapa de calor de la Figura \ref{fig:heatmap1} muestra que el máximo \(F_1\) se alcanza con \(\gamma = 0.6\) y \(\alpha = 1.0\). Penalizaciones bajas producen demasiados cortes, mientras que \(\gamma\) muy alto también incrementa la segmentación.
+\subsection{Caso 1: Segmentación alta}
+Esta instancia presenta una segmentación fina, con muchos cortes y numerosos segmentos unitarios.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{figures/heatmap1.png}
-\caption{Mapa de calor del \(F_1\) medio para la instancia 1.}
+\includegraphics[scale=0.75]{figures/heatmap1.png}
+\caption{Mapa de calor del \(F_1\) para la instancia de segmentación alta.}
 \label{fig:heatmap1}
 \end{figure}
 
-\paragraph{Caso 2: Segmentación media (Instancia 2, n=15)}
-La instancia tiene un número moderado de cortes. De nuevo, la combinación \(\gamma = 0.6\), \(\alpha = 1.0\) es la óptima (Figura \ref{fig:heatmap2}). Se observa que la región de alto \(F_1\) es más amplia que en el caso anterior.
+La Figura~\ref{fig:heatmap1} permite distinguir tres comportamientos en función de los parámetros:
+\begin{itemize}
+    \item \textbf{Diagonal (\(\phi_u\) moderado y \(\alpha\) equilibrado):} la solución devuelta coincide exactamente con la segmentación de referencia (\(F_1 \approx 1\)).
+    \item \textbf{Región inferior (\(\phi_u\) alto, \(\alpha\) bajo):} la escasa penalización por segmento y la alta coherencia unitaria favorecen la creación de segmentos de una sola frase, pero la solución no logra capturar los segmentos multielemento presentes en el óptimo, reduciendo el valor de \(F_1\).
+    \item \textbf{Región superior (\(\phi_u\) bajo, \(\alpha\) alto):} cuando $alpha > 0.5$ la penalización domina sobre la coherencia y el algoritmo opta por la segmentación trivial sin cortes (\(F_1 = 0\)), ya que cualquier segmentación intermedia queda suficientemente penalizada como para no compensar la ganancia en coherencia.
+\end{itemize}
+
+
+
+
+\subsection{Caso 2: Segmentación media}
+La instancia posee un número moderado de cortes reales, combinando segmentos de longitud variada.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{figures/heatmap2.png}
-\caption{Mapa de calor del \(F_1\) medio para la instancia 2.}
+\includegraphics[scale=0.75]{figures/heatmap2.png}
+\caption{Mapa de calor del \(F_1\) para la instancia de segmentación media.}
 \label{fig:heatmap2}
 \end{figure}
 
-\paragraph{Caso 3: Segmentación baja (Instancia 3, n=20)}
-La instancia tiene pocos cortes reales. El óptimo se mantiene en \(\gamma = 0.6\), \(\alpha = 1.0\) (Figura \ref{fig:heatmap3}). Los valores de \(\alpha\) cercanos a \(0\) producen una segmentación excesiva, penalizando el \(F_1\).
+La Figura~\ref{fig:heatmap2} revela un patrón similar al caso anterior, aunque con algunas diferencias relevantes:
+\begin{itemize}
+    \item \textbf{Región inferior (\(\phi_u\) alto, \(\alpha\) bajo):} la baja penalización conduce de nuevo a una segmentación excesiva, con cortes espurios que deterioran notablemente el \(F_1\).
+    \item \textbf{Región superior (\(\phi_u\) bajo, \(\alpha\) moderado):} se obtienen resultados intermedios. La penalización frena la sobre‑segmentación, pero sin alcanzar la estructura exacta de referencia.
+    \item \textbf{Columna derecha (\(\alpha = 1.0\), penalización máxima):} la solución coincide con el óptimo (\(F_1 = 1\)) para prácticamente todos los valores de \(\phi_u\), excepto cuando \(\phi_u\) es muy alto (\(\phi_u > 0.8\)), lo que demuestra que incluso con penalización máxima sigue siendo necesario ajustar la coherencia unitaria para evitar falsos segmentos unitarios.
+\end{itemize}
+
+\subsection{Caso 3: Segmentación baja}
+Esta instancia contiene un único corte real, por lo que la segmentación óptima está formada por solo dos segmentos.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{figures/heatmap3.png}
-\caption{Mapa de calor del \(F_1\) medio para la instancia 3.}
+\includegraphics[scale=0.75]{figures/heatmap3.png}
+\caption{Mapa de calor del \(F_1\) para la instancia de segmentación baja.}
 \label{fig:heatmap3}
 \end{figure}
 
-\subsection{Selección final de parámetros}
-La Tabla \ref{tab:obj_grid} resume los mejores parámetros encontrados para cada instancia. En todos los casos la combinación óptima fue \(\gamma = 0.6\) y \(\alpha = 1.0\). A pesar de que \(\alpha = 1.0\) hace que la función de fitness sea negativa, resultó ser la mejor opción para equilibrar la coherencia y el número de segmentos. Por lo tanto, se fijaron \(\gamma = 0.6\) y \(\alpha = 1.0\) para todos los experimentos posteriores.
+La Figura~\ref{fig:heatmap3} muestra un comportamiento más extremo que en los casos anteriores:
+\begin{itemize}
+    \item \textbf{Columna derecha (\(\alpha = 1.0\)):} la penalización máxima fuerza a que la solución tenga exactamente un corte, y el algoritmo acierta su ubicación correcta, alcanzando \(F_1 = 1\) para todos los valores de \(\phi_u\). La coherencia unitaria resulta irrelevante porque no hay espacio para falsos segmentos unitarios.
+    \item \textbf{Resto del mapa (\(\alpha < 1.0\)):} cualquier penalización inferior provoca una segmentación excesiva, añadiendo cortes inexistentes que alejan la solución de la referencia y producen valores de \(F_1\) bajos o nulos. La presencia de un solo corte real hace que incluso pequeñas desviaciones sean severamente penalizadas por la métrica.
+\end{itemize}
 
-\begin{table}[H]
-\centering
-\caption{Mejores parámetros de la función objetivo por instancia de validación}
-\label{tab:obj_grid}
-\begin{tabular}{ccc}
-\toprule
-Instancia & \(\gamma\) óptimo & \(\alpha\) óptimo \\
-\midrule
-1 (n=20, segmentación alta) & 0.6 & 1.0 \\
-2 (n=15, segmentación media) & 0.6 & 1.0 \\
-3 (n=20, segmentación baja) & 0.6 & 1.0 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Análisis}
+
+Los mapas de calor ponen de manifiesto un conflicto esencial: ninguna combinación de parámetros permite resolver correctamente a la vez instancias muy fragmentadas (Caso 1) e instancias casi sin cortes (Caso 3). La única candidata que cubriría ambos extremos sería \(\phi_u = \alpha = 1.0\), pero ese ajuste introduce falsos segmentos unitarios en el caso de segmentación media, degradando su \(F_1\) de forma apreciable. \\
+
+Ante esta situación, se prioriza el Caso 2 por ser el más representativo de una instancia promedio. Se fijan, por tanto, valores que maximizan su \(F_1\) (\(\boldsymbol{\phi_u} = \mathbf{0.8}\) y \(\boldsymbol{\alpha} = \mathbf{1.0}\)), aun a costa de no alcanzar el óptimo en el Caso 1. \\
+
+Esta decisión se ve respaldada por la naturaleza esperable de las instancias reales. En aplicaciones con grandes volúmenes de datos textuales, los segmentos puramente unitarios rara vez constituyen una segmentación óptima; los cortes suelen agrupar varios elementos relacionados. Por tanto, la incapacidad de resolver el Caso 1 no compromete la utilidad práctica del modelo. Si en un escenario concreto se sospechara la presencia de segmentos unitarios relevantes, se recomendaría elevar ambos parámetros a \(0.8\), desplazando la solución hacia la diagonal que mostró mejores resultados en el Caso 1 sin renunciar por completo a la penalización. \\
+
+Por último, conviene señalar una característica de la función objetivo resultante. Con \(\alpha = 1.0\), la función de \textit{fitness} es no positiva: el valor máximo teórico es \(0\), que se alcanzaría únicamente si cada segmento obtuviera una coherencia perfecta de \(1\) y esta anulara exactamente la penalización acumulada. La solución trivial sin cortes (un solo segmento) tiene como cota inferior \(-1\) (coherencia total \(\in [0,1]\) menos una unidad de penalización). Esta estrechez del rango de valores, unida a la inexactitud inherente a la estimación de coherencia mediante el LLM, podría favorecer sistemáticamente soluciones subóptimas con pocos cortes, ya que pequeñas fluctuaciones en la puntuación de coherencia pueden hacer que la penalización domine y que el algoritmo se estanque. A pesar de ello, este experimento mostró que \(\alpha = 1.0\) es la única penalización capaz de contrarrestar la tendencia a la sobre‑segmentación, por lo que se mantiene como elección de compromiso.
+
+
+
 
 \section{Experimento 2: Ajuste de las metaheurísticas}
 
-\subsection{Objetivo}
-Encontrar la configuración de hiperparámetros que maximice el rendimiento de cada metaheurística (Ascenso de colina, Recocido simulado, Algoritmo genético y Enjambre de partículas) sobre el problema de segmentación.
+\medskip
+\noindent
+\textbf{Objetivo.}
+Encontrar la configuración de hiperparámetros que maximice el rendimiento de cada metaheurística sobre el problema de segmentación.
 
-\subsection{Metodología}
-Para cada algoritmo se muestrearon aleatoriamente 10 combinaciones de hiperparámetros dentro de rangos predefinidos. Cada configuración se evaluó sobre la primera instancia de validación (\(n=20\)) con 3 repeticiones. Se midieron el \(F_1\) medio y el fitness real medio (coherencia total menos penalización). Posteriormente se seleccionó la mejor configuración (mayor \(F_1\) medio) y se registró su curva de convergencia.
+\medskip
+\noindent
+\textbf{Metodología.}
+Para cada algoritmo se muestrearon aleatoriamente 10 combinaciones de hiperparámetros dentro de rangos predefinidos. Cada configuración se evaluó sobre la instancia de validación promedio con 3 repeticiones. Se midió el \(F_1\) medio respecto a la segmentación de referencia. A partir de los resultados se seleccionó la mejor configuración de cada algoritmo.
 
-\subsection{Ascenso de colina (Hill Climbing)}
+\subsection{Ascenso de Colina}
 
 \begin{itemize}
-    \item \textbf{Rango explorado:} 
+    \item \textbf{Rango explorado:}
     \begin{itemize}
-        \item \texttt{límite\_estancamiento} $\in \{50,100,150,200\}$
-        \item \texttt{max\_evaluaciones} $\in \{500,1000,5000\}$
-        \item \texttt{tamaño\_vecindad} $\in \{1,3,5\}$
+        \item Límite de estancamiento: \(\{50, 100, 150, 200\}\)
+        \item Evaluaciones máximas: \(\{500, 1000, 5000\}\)
+        \item Tamaño de vecindad: \(\{1, 3, 5\}\)
     \end{itemize}
     \item \textbf{Muestreo y resultados:} Tabla \ref{tab:hc_results}.
-    \item \textbf{Mejor configuración:} \{\texttt{límite\_estancamiento}=150, \texttt{max\_evaluaciones}=1000, \texttt{tamaño\_vecindad}=5\} con \(F_1\) medio = 1.0000.
-    \item \textbf{Convergencia:} Figura \ref{fig:hc_convergence}.
 \end{itemize}
 
 \begin{table}[H]
 \centering
 \caption{Resultados del muestreo aleatorio para Ascenso de colina}
 \label{tab:hc_results}
-\begin{tabular}{cccccc}
+\begin{tabular}{cccc}
 \toprule
-\textbf{Límite estanc.} & \textbf{Max eval.} & \textbf{Tamaño vecindad} & \textbf{F1 medio} & \textbf{Fitness medio} \\
+\textbf{Límite estanc.} & \textbf{Max eval.} & \textbf{Tamaño vecindad} & \textbf{F1 medio} \\
 \midrule
-150 & 500 & 5 & 0.8571 & -0.3667 \\
-50 & 5000 & 1 & 0.7143 & -0.5333 \\
-150 & 1000 & 5 & 1.0000 & -0.2000 \\
-200 & 500 & 3 & 1.0000 & -0.2000 \\
-200 & 1000 & 1 & 0.8571 & -0.3667 \\
-150 & 500 & 3 & 1.0000 & -0.2000 \\
-50 & 500 & 1 & 1.0000 & -0.2000 \\
-100 & 1000 & 3 & 1.0000 & -0.2000 \\
-50 & 500 & 5 & 0.6190 & -0.5333 \\
-50 & 1000 & 5 & 1.0000 & -0.2000 \\
+150 & 500 & 5 & 0.8571 \\
+50 & 5000 & 1 & 0.7143 \\
+150 & 1000 & 5 & 1.0000 \\
+200 & 500 & 3 & 1.0000 \\
+200 & 1000 & 1 & 0.8571 \\
+150 & 500 & 3 & 1.0000 \\
+50 & 500 & 1 & 1.0000 \\
+100 & 1000 & 3 & 1.0000 \\
+50 & 500 & 5 & 0.6190 \\
+50 & 1000 & 5 & 1.0000 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+Varias combinaciones alcanzaron el óptimo \(F_1 = 1\). La configuración seleccionada, que equilibra bajo coste y exploración suficiente, es:
+\begin{itemize}
+    \item Límite de estancamiento: 150
+    \item Evaluaciones máximas: 500
+    \item Tamaño de vecindad: 3
+\end{itemize}
+
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/hc_convergence.png}
-\caption{Convergencia del mejor fitness para la mejor configuración de Ascenso de colina.}
+\caption{Convergencia del promedio del mejor fitness para la configuración seleccionada de Ascenso de Colina.}
 \label{fig:hc_convergence}
 \end{figure}
 
-\subsection{Recocido simulado (Simulated Annealing)}
+La vecindad de tamaño 3 proporciona suficiente diversidad local sin multiplicar innecesariamente las evaluaciones, mientras que el límite de estancamiento 150 da margen para escapar de óptimos locales poco profundos. 
+El gráfico \ref{fig:hc_convergence} muestra la rapidez con la que el algoritmo converge a un óptimo, lo que justifica la elección de solo 500 evaluaciones.
+
+\subsection{Recocido Simulado}
 
 \begin{itemize}
     \item \textbf{Rango explorado:}
     \begin{itemize}
-        \item \texttt{T0} $\in \{10,50,100\}$
-        \item \texttt{alfa} $\in \{0.8,0.9,0.95,0.99\}$
-        \item \texttt{iteraciones\_por\_T} $\in \{5,10,20,50\}$
-        \item \texttt{max\_evaluaciones} $\in \{1000,2000,5000\}$
-        \item \texttt{T\_min}=0.001 fijo
+        \item Temperatura inicial (\(T_0\)): \(\{10, 50, 100\}\)
+        \item Factor de enfriamiento (\(\alpha\)): \(\{0.8, 0.9, 0.95, 0.99\}\)
+        \item Iteraciones por temperatura: \(\{5, 10, 20, 50\}\)
+        \item Evaluaciones máximas: \(\{1000, 2000, 5000\}\)
+        \item Temperatura mínima: \(0.001\) (fija)
     \end{itemize}
     \item \textbf{Muestreo y resultados:} Tabla \ref{tab:sa_results}.
-    \item \textbf{Mejor configuración:} \{\texttt{T0}=50.0, \texttt{alfa}=0.9, \texttt{iteraciones\_por\_T}=5, \texttt{max\_evaluaciones}=2000\} con \(F_1\) medio = 0.8201.
-    \item \textbf{Convergencia:} Figura \ref{fig:sa_convergence}.
 \end{itemize}
 
 \begin{table}[H]
 \centering
 \caption{Resultados del muestreo aleatorio para Recocido simulado}
 \label{tab:sa_results}
-\begin{tabular}{ccccccc}
+\begin{tabular}{ccccc}
 \toprule
-\textbf{T0} & \textbf{Alfa} & \textbf{Iter./T} & \textbf{Max eval.} & \textbf{F1 medio} & \textbf{Fitness medio} \\
+\textbf{T0} & \textbf{Alfa} & \textbf{Iter./T} & \textbf{Max eval.} & \textbf{F1 medio} \\
 \midrule
-50 & 0.9 & 20 & 5000 & 0.3810 & -0.7000 \\
-50 & 0.9 & 20 & 2000 & 0.5820 & -0.6667 \\
-10 & 0.95 & 20 & 1000 & 0.4762 & -0.7000 \\
-10 & 0.99 & 20 & 5000 & 0.4762 & -0.7000 \\
-10 & 0.8 & 20 & 5000 & 0.4762 & -0.7000 \\
-50 & 0.8 & 5 & 2000 & 0.6349 & -0.6000 \\
-100 & 0.9 & 20 & 1000 & 0.4405 & -0.7667 \\
-50 & 0.9 & 5 & 2000 & 0.8201 & -0.5333 \\
-100 & 0.99 & 20 & 5000 & 0.4868 & -0.6667 \\
-100 & 0.9 & 10 & 5000 & 0.4762 & -0.7000 \\
+50 & 0.9 & 20 & 5000 & 0.3810 \\
+50 & 0.9 & 20 & 2000 & 0.5820 \\
+10 & 0.95 & 20 & 1000 & 0.4762 \\
+10 & 0.99 & 20 & 5000 & 0.4762 \\
+10 & 0.8 & 20 & 5000 & 0.4762 \\
+50 & 0.8 & 5 & 2000 & 0.6349 \\
+100 & 0.9 & 20 & 1000 & 0.4405 \\
+50 & 0.9 & 5 & 2000 & 0.8201 \\
+100 & 0.99 & 20 & 5000 & 0.4868 \\
+100 & 0.9 & 10 & 5000 & 0.4762 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+La combinación con mejor rendimiento fue:
+
+\begin{itemize}
+    \item \(T_0 = 50\)
+    \item \(\alpha = 0.9\)
+    \item Iteraciones por temperatura: 5
+    \item Evaluaciones máximas: 2000
+\end{itemize}
+
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{figures/sa_convergence.png}
-\caption{Convergencia del mejor fitness para la mejor configuración de Recocido simulado.}
+\includegraphics[width=0.65\textwidth]{figures/sa_convergence.png}
+\caption{Convergencia del promedio del mejor fitness para la mejor configuración de Recocido Simulado.}
 \label{fig:sa_convergence}
 \end{figure}
 
-\subsection{Algoritmo genético (Genetic Algorithm)}
+El recocido simulado no obtuvo buenos resultados. La escala pequeña de la función de \textit{fitness} hace que las diferencias \(\Delta f\) entre soluciones vecinas sean ínfimas; la probabilidad de aceptar empeoramientos permanece alta incluso con temperaturas moderadas, lo que dificulta la convergencia fina. La configuración con \(\alpha = 0.9\) y pocas iteraciones por temperatura (\(5\)) resultó la más efectiva, ya que un enfriamiento más rápido reduce antes la aceptación de soluciones malas.
+
+\subsection{Algoritmo Genético}
 
 \begin{itemize}
     \item \textbf{Rango explorado:}
     \begin{itemize}
-        \item \texttt{tamaño\_población} $\in \{10,20,50\}$
-        \item \texttt{tasa\_mutación} $\in \{0.01,0.05,0.1\}$
-        \item \texttt{elitismo} $\in \{1,3,5\}$
-        \item \texttt{max\_generaciones} $\in \{20,50,100\}$
-        \item \texttt{max\_evaluaciones} $\in \{1000,5000\}$
+        \item Tamaño de población: \(\{10, 20, 50\}\)
+        \item Tasa de mutación: \(\{0.01, 0.05, 0.1\}\)
+        \item Elitismo: \(\{1, 3, 5\}\)
+        \item Generaciones máximas: \(\{20, 50, 100\}\)
+        \item Evaluaciones máximas: \(\{1000, 5000\}\)
     \end{itemize}
     \item \textbf{Muestreo y resultados:} Tabla \ref{tab:ga_results}.
-    \item \textbf{Mejor configuración:} \{\texttt{tamaño\_población}=50, \texttt{tasa\_mutación}=0.05, \texttt{elitismo}=1, \texttt{max\_generaciones}=100, \texttt{max\_evaluaciones}=5000\} con \(F_1\) medio = 1.0000.
-    \item \textbf{Convergencia:} Figura \ref{fig:ga_convergence}.
 \end{itemize}
 
 \begin{table}[H]
 \centering
 \caption{Resultados del muestreo aleatorio para Algoritmo genético}
 \label{tab:ga_results}
-\begin{tabular}{ccccccc}
+\begin{tabular}{cccccc}
 \toprule
 \textbf{Población} & \textbf{Tasa mut.} & \textbf{Elitismo} & \textbf{Gen.} & \textbf{Max eval.} & \textbf{F1 medio} \\
 \midrule
@@ -634,36 +667,39 @@ Para cada algoritmo se muestrearon aleatoriamente 10 combinaciones de hiperpará
 \end{tabular}
 \end{table}
 
+La configuración con menor presupuesto que alcanzó \(F_1 = 1\) es:
+población 50, tasa de mutación 0.05, elitismo 3, 100 generaciones, 1000 evaluaciones.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/ga_convergence.png}
-\caption{Convergencia del fitness promedio para la mejor configuración del Algoritmo genético.}
+\caption{Convergencia del promedio del mejor fitness para la configuración seleccionada del Algoritmo genético.}
 \label{fig:ga_convergence}
 \end{figure}
 
-\subsection{Enjambre de partículas (Particle Swarm Optimization)}
+La población grande y una tasa de mutación moderada proporcionan un equilibrio adecuado: suficiente diversidad para explorar sin destruir los bloques prometedores. En contraste, las configuraciones con población pequeña y mutación alta degradan el rendimiento, ya que la excesiva variación impide la consolidación de buenos esquemas.
+
+\subsection{Enjambre de Partículas}
 
 \begin{itemize}
     \item \textbf{Rango explorado:}
     \begin{itemize}
-        \item \texttt{tamaño\_población} $\in \{10,20,50\}$
-        \item \texttt{w} $\in \{0.5,0.7,0.9\}$
-        \item \texttt{c1} $\in \{1.0,1.5,2.0,2.5\}$
-        \item \texttt{c2} $\in \{1.0,1.5,2.0,2.5\}$
-        \item \texttt{max\_generaciones} $\in \{20,50,100\}$
-        \item \texttt{max\_evaluaciones} $\in \{1000,5000\}$
-        \item \texttt{v\_max} $\in \{2.0,5.0,10.0\}$
+        \item Tamaño de población: \(\{10, 20, 50\}\)
+        \item Inercia (\(w\)): \(\{0.5, 0.7, 0.9\}\)
+        \item Coeficiente cognitivo (\(c_1\)): \(\{1.0, 1.5, 2.0, 2.5\}\)
+        \item Coeficiente social (\(c_2\)): \(\{1.0, 1.5, 2.0, 2.5\}\)
+        \item Generaciones máximas: \(\{20, 50, 100\}\)
+        \item Evaluaciones máximas: \(\{1000, 5000\}\)
+        \item Velocidad máxima (\(v_{\max}\)): \(\{2.0, 5.0, 10.0\}\)
     \end{itemize}
     \item \textbf{Muestreo y resultados:} Tabla \ref{tab:pso_results}.
-    \item \textbf{Mejor configuración:} \{\texttt{tamaño\_población}=50, \texttt{w}=0.7, \texttt{c1}=2.0, \texttt{c2}=2.0, \texttt{max\_generaciones}=100, \texttt{max\_evaluaciones}=5000, \texttt{v\_max}=5.0\} con \(F_1\) medio = 1.0000.
-    \item \textbf{Convergencia:} Figura \ref{fig:pso_convergence}.
 \end{itemize}
 
 \begin{table}[H]
 \centering
 \caption{Resultados del muestreo aleatorio para Enjambre de partículas (PSO)}
 \label{tab:pso_results}
-\begin{tabular}{ccccccccc}
+\begin{tabular}{cccccccc}
 \toprule
 \textbf{Pobl.} & \textbf{w} & \textbf{c1} & \textbf{c2} & \textbf{Gen.} & \textbf{Max eval.} & \textbf{v\_max} & \textbf{F1 medio} \\
 \midrule
@@ -681,36 +717,52 @@ Para cada algoritmo se muestrearon aleatoriamente 10 combinaciones de hiperpará
 \end{tabular}
 \end{table}
 
+La única configuración que alcanzó \(F_1 = 1\) fue:
+población 50, \(w=0.7\), \(c_1=2.0\), \(c_2=2.0\), 100 generaciones, 5000 evaluaciones, \(v_{\max}=5.0\).
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/pso_convergence.png}
-\caption{Convergencia del mejor fitness para la mejor configuración de PSO.}
+\caption{Convergencia del promedio del mejor fitness para la mejor configuración de PSO.}
 \label{fig:pso_convergence}
 \end{figure}
 
-\section{Experimento 3: Evaluación de las metaheurísticas}
+La inercia \(w = 0.7\) y coeficientes \(c_1 = c_2 = 2.0\) equilibran la exploración individual y la social. El límite de velocidad \(v_{\max} = 5.0\) evita la saturación de la sigmoide, mientras que la población grande y 100 generaciones ofrecen el tiempo necesario para que el enjambre converja al óptimo global de forma precisa.
 
-\subsection{Objetivo}
-Comparar el rendimiento de las cuatro metaheurísticas, cada una con su mejor configuración hallada en el Experimento 2, sobre un conjunto de cinco instancias de prueba no vistas durante el ajuste (índices 4 a 8 del conjunto de datos, todas con \(n = 20\) elementos). La métrica principal fue el \(F_1\) medio.
+\subsection{Análisis}
 
-\subsection{Metodología}
-Para cada metaheurística se ejecutó la mejor configuración obtenida en el Experimento 2 sobre cada una de las cinco instancias de prueba, registrando el \(F_1\) y el fitness real. Se reportan la media, desviación estándar, mínimo, máximo y el número promedio de evaluaciones.
+Los resultados del ajuste ponen de manifiesto diferencias importantes entre las metaheurísticas:
 
-\subsection{Resultados esperados}
 \begin{itemize}
-    \item Las metaheurísticas poblacionales (Algoritmo genético y PSO) deberían superar a las de búsqueda local (Ascenso de colina y Recocido simulado) debido a su capacidad para explorar mejor el espacio de búsqueda combinatorio.
-    \item Se esperaba que PSO, al mantener una memoria de las mejores posiciones, fuera especialmente efectivo.
-    \item El recocido simulado podría mostrar una alta variabilidad debido a su dependencia de la temperatura inicial y el enfriamiento.
+    \item \textbf{Algoritmos que alcanzan el óptimo:} Ascenso de Colina, Algoritmo Genético y PSO consiguen \(F_1 = 1\) en la instancia de validación. La elección de las configuraciones finales se basó en criterios de robustez y eficiencia computacional.
+
+    \item \textbf{Consistencia de PSO:} todos los resultados de PSO se sitúan por encima de \(F_1 = 0.8\), lo que demuestra una notable robustez frente a variaciones en los hiperparámetros. Incluso con poblaciones pequeñas (\(10\) partículas) y distintas combinaciones de inercia y coeficientes, el algoritmo mantiene un rendimiento alto, confirmando su capacidad para explorar eficazmente el espacio de soluciones.
+
+    \item \textbf{Sensibilidad y coste:} Ascenso de colina destaca por su bajo coste. Los algoritmos poblacionales requieren más recursos, pero ofrecen mecanismos de exploración más potentes que pueden ser decisivos en instancias más complejas.
+
+    \item \textbf{Convergencia:} Las curvas muestran que Ascenso de Colina progresa rápidamente hacia el óptimo, mientras que GA y PSO mejoran gradualmente a lo largo de las generaciones. Recocido Simulado mejora el \textit{fitness} de forma lenta y escalonada antes de estancarse en un óptimo local.
 \end{itemize}
 
-\subsection{Resultados obtenidos}
-La Tabla \ref{tab:final_results} resume los resultados. El Enjambre de partículas (PSO) alcanzó el mejor \(F_1\) medio (0.9025), seguido muy de cerca por el Algoritmo genético (0.8814). El Ascenso de colina obtuvo un rendimiento intermedio (0.7162) y el Recocido simulado mostró la mayor variabilidad y el peor valor medio (0.5447).
+\section{Experimento 3: Evaluación de las metaheurísticas}
+
+\medskip
+\noindent
+\textbf{Objetivo.}
+Comparar el rendimiento de las cuatro metaheurísticas, cada una con su mejor configuración y sobre un conjunto de instancias no vistas durante el ajuste.
+
+\medskip
+\noindent
+\textbf{Metodología.}
+Se evaluó la mejor configuración de cada algoritmo seleccionada en el Experimento 2 \footnote{Debido a limitaciones logísticas, se estableció $1000$ como cota superior del número máximo de evaluaciones.} sobre las cinco instancias de prueba, registrando la métrica \(F_1\) y el \textit{fitness}. Se reportan la media, desviación estándar, valores extremos y el número promedio de evaluaciones consumidas.
+
+\subsection{Resultados}
+La Tabla \ref{tab:final_results} resume los resultados. El Enjambre de Partículas (PSO) alcanzó el mejor \(F_1\) medio (\(0.9025\)), seguido de cerca por el Algoritmo Genético (\(0.8814\)). El Ascenso de Colina obtuvo un rendimiento intermedio (\(0.7162\)) y el Recocido Simulado mostró la mayor variabilidad y el peor valor medio (\(0.5447\)).
 
 \begin{table}[H]
 \centering
 \caption{Resultados comparativos sobre las cinco instancias de prueba}
 \label{tab:final_results}
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccc}
 \toprule
 \textbf{Metaheurística} & \textbf{F1 medio} & \textbf{F1 std} & \textbf{F1 min} & \textbf{F1 max} & \textbf{Evaluaciones} \\
 \midrule
@@ -722,31 +774,73 @@ Recocido simulado & 0.5447 & 0.1316 & 0.3578 & 0.7348 & 246 \\
 \end{tabular}
 \end{table}
 
-La Figura \ref{fig:final_convergence} muestra las curvas de convergencia promediadas de las cuatro metaheurísticas durante sus ejecuciones.
+La Figura \ref{fig:final_convergence} muestra las curvas de convergencia promediadas durante las ejecuciones.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/final_convergence.png}
+\includegraphics[width=\textwidth]{figures/final_convergence.png}
 \caption{Comparación de las curvas de convergencia (mejor fitness) de las cuatro metaheurísticas sobre las instancias de prueba.}
 \label{fig:final_convergence}
 \end{figure}
 
-\subsection{Conclusiones del experimento 3}
-El Enjambre de partículas resultó ser la metaheurística más efectiva para el problema de segmentación basada en coherencia semántica, logrando un \(F_1\) medio de 0.9025. Su capacidad de equilibrar exploración y explotación, junto con la memoria de las mejores posiciones individuales y globales, le permitió encontrar particiones de alta calidad. El Algoritmo genético también mostró un rendimiento excelente, aunque ligeramente inferior. Las metaheurísticas de búsqueda local se vieron limitadas por la naturaleza multimodal del espacio de búsqueda. Por lo tanto, se selecciona PSO con la configuración encontrada como la estrategia final para el sistema.
+La observación de las curvas de convergencia y del consumo de evaluaciones revela diferencias en la dinámica de búsqueda:
+
+\begin{itemize}
+    \item \textbf{Ascenso de Colina} se detiene tras consumir en promedio 496 evaluaciones de las 500 disponibles. El criterio de parada que actúa es el límite de estancamiento: la búsqueda local queda atrapada en un óptimo local y el algoritmo se detiene automáticamente al superar el umbral de iteraciones sin progreso.
+
+    \item \textbf{Recocido Simulado} apenas utiliza 246 evaluaciones de las 1000 permitidas. Esta parada tan prematura evidencia un enfriamiento excesivamente rápido: la temperatura desciende por debajo del valor mínimo \(T_{\min}\) antes de que el algoritmo haya podido explorar regiones alternativas del espacio de búsqueda. La alta variabilidad en sus resultados (\(F_1\) entre 0.36 y 0.73) refleja la dependencia del azar en un esquema que no llega a converger adecuadamente.
+   
+    \item \textbf{Algoritmo genético y PSO} sí agotan su presupuesto de evaluaciones, pero el gráfico de convergencia revela que lo hacen tras haber completado pocas generaciones. Con un número muy limitado de ciclos evolutivos, ambos algoritmos consiguen concentrar la búsqueda en regiones de alta calidad y alcanzan soluciones buenas de forma consistente, lo que confirma su eficiencia y convierte estos resultados en un excelente punto de partida.
+\end{itemize}
+
+\subsection{Análisis}
+
+El Enjambre de Partículas resultó ser la estrategia más efectiva para el problema de segmentación. Su buen desempeño concuerda con la consistencia observada en el Experimento 2, donde incluso las configuraciones menos favorables mantenían un rendimiento superior al de otras metaheurísticas. \\
+
+
+
+Las diferencias observadas se explican por la estructura del paisaje de búsqueda. La función objetivo genera múltiples óptimos locales distribuidos por todo el espacio. Los algoritmos de trayectoria carecen de mecanismos para escapar de estas trampas una vez que se aproximan a ellas; el primero porque solo acepta mejoras, el segundo porque se enfría antes de poder saltar a otra cuenca de atracción. Los enfoques poblacionales, en cambio, mantienen una diversidad de soluciones que les permite explorar simultáneamente distintas regiones y recombinar información prometedora, lo que les confiere una ventaja decisiva en este tipo de paisajes. \\
+
+En consecuencia, se selecciona el Enjambre de Partículas con su configuración óptima (\(w=0.7\), \(c_1=c_2=2.0\), población 50, \(v_{\max}=5.0\)) como la estrategia final para el sistema de segmentación de contenido basado en coherencia semántica.
+
 
 
 \chapter{Conclusiones}
 
-En este trabajo se ha abordado el problema de segmentación óptima de contenido guiada por coherencia semántica, empleando técnicas clásicas de optimización y un LLM como evaluador. Los resultados muestran que:
-\begin{itemize}
-    \item La programación dinámica es viable como referencia exacta en instancias pequeñas, pero su complejidad cuadrática en número de evaluaciones limita su aplicación práctica cuando el evaluador es un LLM.
-    \item Las metaheurísticas, en particular el Simulated Annealing con caché, logran aproximar el óptimo con un número controlado de consultas al modelo de lenguaje.
-    \item La integración de un modelo de lenguaje como función de evaluación semántica es factible y aporta una noción de coherencia más profunda que las métricas puramente léxicas, siempre que se gestione adecuadamente el coste asociado.
-    \item Estrategias como el uso de sustitutos rápidos (embeddings) y el almacenamiento en caché resultan esenciales para viabilizar la optimización en escenarios realistas.
-\end{itemize}
-Se ha cumplido el doble objetivo de aplicar técnicas de búsqueda y optimización de la asignatura y de incorporar un LLM como componente funcional desacoplado. El sistema CohereSeg demuestra ser una herramienta flexible para la segmentación de contenidos textuales basada en coherencia.
+\begin{enumerate}
+    \item \textbf{Formalización efectiva del problema.} 
+    La formulación mediante un vector binario de cortes, una función de coherencia agregada evaluada por el LLM y un término de penalización por número de segmentos ($\alpha$) ha demostrado ser adecuada para capturar la esencia de la tarea. La introducción de una puntuación fija para segmentos unitarios ($\phi_u$) permitió evitar llamadas innecesarias a la API y controlar la fragmentación excesiva.
+    
+    \item \textbf{Interacción crítica entre parámetros de la función objetivo.}
+    El estudio paramétrico con solución exacta (Experimento 1) reveló un conflicto inherente: ninguna combinación de $\phi_u$ y $\alpha$ optimiza simultáneamente todos los tipos de instancia. La elección de $\phi_u = 0.8$ y $\alpha = 1.0$ priorizó el caso promedio, reconociendo que en aplicaciones reales con textos extensos los segmentos puramente unitarios son poco frecuentes. 
+    
+    \item \textbf{Arquitectura de \textit{framework} reutilizable y extensible.}
+    Las clases abstractas \texttt{SingleSolutionMetaheuristic} y \texttt{PopulationMetaheuristic} proporcionan métodos \texttt{solve} universales que encapsulan el bucle de búsqueda completo y delegan en las subclases únicamente los operadores específicos de cada algoritmo. La implementación de Ascenso de Colina, Recocido Simulado, Algoritmo Genético y Enjambre de Partículas confirma la elegancia y flexibilidad del \textit{framework}.
+    
+    \item \textbf{Integración eficiente del modelo de lenguaje.}
+    El uso de un \textit{prompt} sencillo que solicita una puntuación numérica de coherencia, combinado con una caché persistente en disco, resultó esencial para amortizar el coste de las consultas a la API y permitir comparaciones justas entre algoritmos sobre evaluaciones idénticas. 
+    
+    \item \textbf{Superioridad de las metaheurísticas poblacionales.}
+    En la evaluación final sobre instancias de prueba, el Enjambre de Partículas obtuvo el mejor rendimiento medio, seguido de cerca por el Algoritmo Genético. Ambos superaron ampliamente a los métodos de trayectoria, en particular a Recocido Simulado, que mostró el peor desempeño y alta variabilidad.
+    
+    \item \textbf{Robustez y eficiencia del PSO.}
+    La consistencia del PSO en todas las configuraciones probadas (Experimento 2) y su capacidad para alcanzar soluciones de alta calidad con un presupuesto limitado de 1000 evaluaciones lo convierten en la estrategia recomendada para el sistema final.
+\end{enumerate}
 
-\chapter{Recomendaciones}
+    \chapter{Recomendaciones}
+
+A partir de los resultados obtenidos y las limitaciones encontradas, se proponen las siguientes líneas de trabajo futuro y mejoras:
+
+\begin{itemize}
+    \item \textbf{Ampliación del conjunto de datos y del presupuesto de evaluaciones.} 
+    El tamaño reducido del \textit{dataset} (8 instancias de 20 elementos) y el límite tan reducido de evaluaciones impuesto en los experimentos restringen la generalización de las conclusiones y no permiten observar el verdadero potencial de las metaheurísticas. Se recomienda construir un \textit{benchmark} más extenso, con secuencias de 50 a 200 elementos, diversos dominios temáticos y anotaciones consensuadas por múltiples jueces humanos, y repetir la comparación con un presupuesto de consultas sustancialmente mayor (del orden de 10\,000 o 50\,000 evaluaciones). Esto permitiría validar la escalabilidad de los algoritmos y afinar los parámetros con mayor confianza estadística.
+    
+    \item \textbf{Exploración de funciones objetivo alternativas.}
+    La penalización lineal $\alpha \cdot k$ demostró ser efectiva pero generó un rango de \textit{fitness} muy estrecho que perjudicó al Recocido Simulado. Se sugiere investigar penalizaciones no lineales, normalizaciones adaptativas o funciones multiobjetivo que optimicen simultáneamente la coherencia media y el número de segmentos, proporcionando un paisaje de búsqueda más amigable para algoritmos basados en diferencias de calidad.
+    
+    \item \textbf{Incorporación de modelos de lenguaje alternativos y estudio del \textit{prompt}.}
+    El uso de \texttt{gemini-3.1-flash-lite} respondió a un criterio práctico, pero conviene evaluar el impacto de modelos con mayor capacidad semántica o ajustados mediante \textit{fine-tuning} en la calidad de las puntuaciones de coherencia. De forma complementaria, se recomienda experimentar con distintos diseños del \textit{prompt} (escala de puntuación más granular, petición de justificación previa, inclusión de ejemplos) para analizar cómo afectan al rendimiento final del sistema. 
+\end{itemize}
 
 
 
