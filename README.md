@@ -1,10 +1,9 @@
 # SegmentationOpt
 
-Proyecto base para la optimización de segmentación de texto mediante coherencia semántica.
+Proyecto para la optimización de segmentación de texto mediante coherencia semántica.
 
 ## Estructura del proyecto
 
-- `main.py`: punto de entrada para ejecutar soluciones exactas y metaheurísticas desde la línea de comandos.
 - `llm.py`: funciones para evaluar la coherencia de segmentos con un LLM externo. Incluye caché local y gestión de claves.
 - `dp.py`: solución exacta por programación dinámica para encontrar la segmentación óptima.
 - `problem.py`: definición de la interfaz `Problem` y el problema concreto de segmentación de contenido.
@@ -49,44 +48,20 @@ API_KEY_DE_GOOGLE_GEN_AI_2
 
 ### Ejecutar los algoritmos sobre el dataset
 
-El archivo `main.py` ejecuta los cuatro algoritmos metaheurísticos sobre la primera instancia del dataset.json:
+El archivo `main.py` ejecuta los cuatro algoritmos metaheurísticos sobre la primera instancia del dataset.json.
 
-- **Hill Climbing**
-- **Simulated Annealing**
-- **Genetic Algorithm**
-- **Particle Swarm Optimization**
-
-Cada algoritmo se ejecuta con parámetros óptimos preconfigurados:
-
-```bash
-python3 main.py
-```
-
-La salida muestra para cada algoritmo:
-- Fitness final
-- Cortes encontrados
-- Número de evaluaciones
-- Número de iteraciones o generaciones
+El archivo `experiments.py` contiene los experimentos y sus resultados.
 
 
-## Configuración del problema
-
-- `ContentSegmentationProblem` ahora acepta parámetros `unit_coherence` y `alpha` para que el mismo problema pueda evaluarse con distintas configuraciones.
-- `dp.py` permite ejecutar la estrategia exacta de programación dinámica con parámetros `unit_coherence` y `alpha`.
-
-## Ejemplo de uso en código
+### Ejemplo de uso en código
 
 ```python
-from dp import dp_solution
 from problem import ContentSegmentationProblem
 from metaheuristics import HillClimbing
 
 sequence = ["Fragmento uno.", "Fragmento dos.", "Fragmento tres."]
 
-cuts, score = dp_solution(sequence, unit_coherence=0.7, alpha=1.0)
-print(cuts, score)
-
-problem = ContentSegmentationProblem(sequence, unit_coherence=0.7, alpha=1.0)
+problem = ContentSegmentationProblem(sequence)
 solver = HillClimbing(max_evaluations=500, neighborhood_size=2)
 best_solution, best_score, state = solver.solve(problem)
 print(best_solution, best_score)
@@ -96,5 +71,3 @@ print(best_solution, best_score)
 
 - `keys.txt` debe existir en la raíz del proyecto.
 - El archivo de caché `data/llm_cache.json` se genera automáticamente.
-- Usa `python main.py --method dp` para comparar resultados exactos con las metaheurísticas.
-
